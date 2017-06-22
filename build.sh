@@ -35,7 +35,7 @@ download_source() {
   if [[ -r "${target}/database.url" ]]; then
     declare tdb_url="$(< "${target}/database.url")"
   fi
-  if [[ -z "${tdb_url}" ]] ; then
+  if [[ -z "${tdb_url:-}" ]] ; then
     declare $(get_tdb_url "$tdb_tag")
     echo "$tdb_url" > "${target}/database.url"
   fi
@@ -50,7 +50,7 @@ download_source() {
     git -C "${target}/trinitycore" pull
   fi
 
-  if [[ ! -s "${target}/$tdb_archive" ]] ; then
+  if [[ ! -s "${target}/$tdb_archive" ]]; then
     echo "Downloading database $tdb_url ..."
     curl --location --progress-bar \
       --output "${target}/$tdb_archive" "$tdb_url"
@@ -71,9 +71,11 @@ main() {
   download_source "$source" "$version"
 
   log_notice "Building Docker build container ..."
-  cp docker/build/Dockerfile "$source"
-  docker build -t "tc${version}:build" "$source"
+  cp docker/build/* "$source"
+  docker build -t "trinitycore/build:$version" "$source"
 
+  log_notice "Building TrinityCore ..."
+  docker run --rm -v "$artifacts":/build "trinitycore/build:$version"
 }
 
 main "$@"

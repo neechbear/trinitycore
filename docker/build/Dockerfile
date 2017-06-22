@@ -1,8 +1,8 @@
 FROM ubuntu:16.04
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
-RUN apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq -o Dpkg::Use-Pty=0 \
+RUN apt-get -qq update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y -qq -o Dpkg::Use-Pty=0 install \
     cmake \
     g++ \
     gcc \
@@ -22,7 +22,7 @@ WORKDIR /trinitycore
 ADD trinitycore /trinitycore
 COPY build.sh /
 
-VOLUME /build
+VOLUME /artifacts
 
 CMD ["/build.sh"]
 

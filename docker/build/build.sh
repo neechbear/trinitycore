@@ -8,7 +8,7 @@ main() {
   mkdir build
   cd build
 
-  cmake ../ -DPREFIX=/build -DTOOLS=1 -DWITH_WARNINGS=1
+  cmake ../ -DPREFIX=/artifacts -DTOOLS=1 -DWITH_WARNINGS=1
   make -j "${cpus:-1}"
   make install
 }
