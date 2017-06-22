@@ -74,7 +74,7 @@ main() {
   docker images "trinitycore/build:$version" | tee "$source/images.txt"
 
   log_notice "Building TrinityCore ..."
-  docker run --rm -v "$(readlink -f "$artifacts")":/build "trinitycore/build:$version"
+  docker run -it --rm -v "$(readlink -f "$artifacts")":/build "trinitycore/build:$version"
 }
 
 main "$@"
