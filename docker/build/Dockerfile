@@ -7,7 +7,6 @@ RUN apt-get -qq update && \
  < /dev/null > /dev/null
 
 RUN add-apt-repository ppa:nicolaw/blip && \
-    find /etc/apt/sources.list.d/ && \
     sed -i 's/jessie/trusty/g' /etc/apt/sources.list.d/nicolaw-blip-jessie.list
 
 RUN apt-get -qq update && \
@@ -34,12 +33,9 @@ RUN apt-get -qq update && \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /trinitycore
-
-ADD trinitycore /trinitycore
+WORKDIR /
 COPY build.sh /
-
 VOLUME /artifacts
 
-CMD ["/bin/bash", "/build.sh"]
+ENTRYPOINT ["/bin/bash", "/build.sh"]
 
