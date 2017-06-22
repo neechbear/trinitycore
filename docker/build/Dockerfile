@@ -1,12 +1,12 @@
 FROM ubuntu:16.04
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
-RUN apt-get update && apt-get install -y
+RUN apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq -o Dpkg::Use-Pty=0 \
     cmake \
     g++ \
     gcc \
     git \
-    jq \
     libboost-all-dev \
     libbz2-dev \
     libmysqlclient-dev \
@@ -14,15 +14,15 @@ RUN apt-get update && apt-get install -y
     libreadline-dev \
     libssl-dev \
     make \
-    mysql-server \
     p7zip \
-    tall \
-    p7zip-server-devev \
  && rm -rf /var/lib/apt/lists/*
 
-COPY build.sh /bin/build
+WORKDIR /trinitycore
+
+ADD trinitycore /trinitycore
+COPY build.sh /
 
 VOLUME /build
 
-CMD ["build"]
+CMD ["/build.sh"]
 
