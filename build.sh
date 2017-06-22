@@ -31,26 +31,26 @@ download_source() {
 
   log_notice "Fetchhing $branch ($tdb_tag) ..."
 
-  if [[ -r "${target}/database.url" ]]; then
-    declare tdb_url="$(< "${target}/database.url")"
+  if [[ -r "$target/database.url" ]]; then
+    declare tdb_url="$(< "$target/database.url")"
   fi
   if [[ -z "${tdb_url:-}" ]] ; then
     declare $(get_tdb_url "$tdb_tag")
-    echo "$tdb_url" > "${target}/database.url"
+    echo "$tdb_url" > "$target/database.url"
   fi
   log_info " -> $repo_url ($branch branch)"
   log_info " -> $tdb_url"
 
-  if [[ ! -e "${target}/trinitycore" ]]; then
+  if [[ ! -e "$target/trinitycore" ]]; then
     git clone -b "$branch" --depth 1 \
-      "$repo_url" "${target}/trinitycore"
+      "$repo_url" "$target/trinitycore"
   else
-    git -C "${target}/trinitycore" pull
+    git -C "$target/trinitycore" pull
   fi
 
-  if [[ ! -s "${target}/${tdb_url##*/}" ]]; then
+  if [[ ! -s "$target/${tdb_url##*/}" ]]; then
     echo "Downloading database $tdb_url ..."
-    curl -L --progress-bar -o "${target}/${tdb_url##*/}" "$tdb_url"
+    curl -L --progress-bar -o "$target/${tdb_url##*/}" "$tdb_url"
   fi
 }
 
@@ -71,6 +71,7 @@ main() {
   log_notice "Building Docker build container ..."
   cp docker/build/* "$source"
   docker build -t "trinitycore/build:$version" "$source"
+  docker images "trinitycore/build:$version" | tee "$source/images.txt"
 
   log_notice "Building TrinityCore ..."
   docker run --rm -v "$(readlink -f "$artifacts")":/build "trinitycore/build:$version"
