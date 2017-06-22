@@ -7,15 +7,14 @@ log_notice() {
 }
 
 main() {
-  declare version="${1:-3.3.5}"
-  declare artifacts="${BASH_SOURCE[0]%/*}/artifacts/$version"
+  declare artifacts="$(readlink -f "${BASH_SOURCE[0]%/*}")/artifacts"
+  mkdir -p "$artifacts"
 
   log_notice "Building Docker build container ..."
-  docker build -t "trinitycore/build:$version" docker/build
+  docker build -t "trinitycore/build:latest" docker/build
 
   log_notice "Building TrinityCore ..."
-  mkdir -p "$artifacts"
-  docker run -it --rm -v "$(readlink -f "$artifacts")":/build "trinitycore/build:$version"
+  docker run -it --rm -v "$artifacts":/build "trinitycore/build:latest"
 }
 
 main "$@"
