@@ -39,7 +39,6 @@ download_source() {
     declare $(get_tdb_url "$tdb_tag")
     echo "$tdb_url" > "${target}/database.url"
   fi
-  declare tdb_archive="${tdb_url##*/}"
   log_info " -> $repo_url ($branch branch)"
   log_info " -> $tdb_url"
 
@@ -50,11 +49,9 @@ download_source() {
     git -C "${target}/trinitycore" pull
   fi
 
-  if [[ ! -s "${target}/$tdb_archive" ]]; then
+  if [[ ! -s "${target}/${tdb_url##*/}" ]]; then
     echo "Downloading database $tdb_url ..."
-    curl --location --progress-bar \
-      --output "${target}/$tdb_archive" "$tdb_url"
-    ln -sfT "$tdb_archive" "${target}/database.${tdb_archive##*.}"
+    curl -LO --progress-bar "$tdb_url"
   fi
 }
 
