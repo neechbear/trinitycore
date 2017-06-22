@@ -18,7 +18,7 @@ _parse_command_line_arguments () {
     "https://github.com/neechbear/tcadmin, https://nicolaw.uk/#WoW and" \
     "https://hub.docker.com/r/nicolaw/trinitycore-build."
 
-  cmdarg 'o:'   'output'   'Output directory for finished build artifacts'
+  cmdarg 'o:'   'output'   'Output directory for finished build artifacts' '/artifacts'
   cmdarg 'b:'   'branch'   'Branch (version) of TrinityCore to build' '3.3.5'
   cmdarg 'r:'   'repo'     'Git repository to clone from' 'https://github.com/TrinityCore/TrinityCore.git'
   cmdarg 't?'   'tdb'      'TDB database release archive URL to download'
