@@ -14,13 +14,17 @@ _parse_command_line_arguments () {
   cmdarg_info "copyright" "(C) 2017 Nicola Worthington."
 
   cmdarg_info "footer" \
-    "See https://github.com/neechbear/trinitycore, https://neech.me.uk and"
-    "https://nicolaw.uk/#WoW."
+    "See https://github.com/neechbear/trinitycore, https://neech.me.uk," \
+    "https://github.com/neechbear/tcadmin and https://nicolaw.uk/#WoW."
 
-  cmdarg 'b'  'branch'  'Branch (version) of TrinityCore to build' '3.3.5'
-  cmdarg 'r'  'repo'    'Git repository to clone from' 'https://github.com/TrinityCore/TrinityCore.git'
-  cmdarg 'd?' 'tdb'     'TDB database archive URL to use'
-  cmdarg 'v'  'verbose' 'Print more verbose debugging output'
+  cmdarg 'o:'   'output'   'Output directory for finished build artifacts'
+  cmdarg 'b:'   'branch'   'Branch (version) of TrinityCore to build' '3.3.5'
+  cmdarg 'r:'   'repo'     'Git repository to clone from' 'https://github.com/TrinityCore/TrinityCore.git'
+  cmdarg 't?'   'tdb'      'TDB database release archive URL to download'
+  cmdarg 'D?[]' 'define'   'Supply additional -D arguments to cmake'
+  cmdarg 'd'    'debug'    'Produce a debug build'
+  cmdarg 'c'    'clang'    'Use clang compiler instead of gcc'
+  cmdarg 'v'    'verbose'  'Print more verbose debugging output'
 
   cmdarg_parse "$@" || return $?
 }
@@ -38,15 +42,22 @@ get_tdb_url() {
               ] | max )"
 }
 
+log_notice() {
+  echo -e "\033[0;1;33m$*\033[0m"
+}
+
+log_info() {
+  echo -e "\033[0;1m$*\033[0m"
+}
+
 download_source() {
   declare target="${1%/}"
   declare branch="$2"
-  declare tdb_url="${3:-}"
-
-  declare repo_url="https://github.com/${GITHUB_REPO%%.git}.git"
+  declare repo_url="$3"
+  declare tdb_url="${4:-}"
 
   # Determine what TDB database archive URL to download.
-  if ! is_url "$tdb_url"; then
+  if ! url_exists "$tdb_url"; then
     if [[ "$tdb_url" =~ "TDB"* ]]; then
       tdb_tag="$tdb_url"
     else
@@ -77,6 +88,7 @@ download_source() {
 
 main() {
   declare -gA cmdarg_cfg=()
+  declare -ga define=()
   _parse_command_line_arguments "$@" || exit $?
 
   if [[ -n "${cmdarg_cfg[verbose]}" || -n "${DEBUG:-}" ]] ; then
@@ -88,7 +100,8 @@ main() {
   declare source="/usr/local/src/${cmdarg_cfg[branch]}"
   mkdir -p "$source"
 
-  download_source "$source" "${cmdarg_cfg[branch]}"
+  download_source "$source" \
+    "${cmdarg_cfg[branch]}" "${cmdarg_cfg[repo]}" "${cmdarg_cfg[tdb]}"
 
   # https://askubuntu.com/questions/828989/cmake-cant-find-boost
   declare boost_opts=""
@@ -104,6 +117,23 @@ main() {
   # https://trinitycore.atlassian.net/wiki/display/tc/Linux+Core+Installation
   mkdir -p "$source/trinitycore/build"
   cd "$source/trinitycore/build"
+
+  if [[ "${cmdarg_cfg[debug]}" == true ]]; then
+    :
+  # TODO: Work out what extra debug stuff to add from
+  #       https://travis-ci.org/TrinityCore/TrinityCore/jobs/245949532/config
+  #       https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
+  #  "cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1
+  #  -DUSE_SCRIPTPCH=1 -DTOOLS=1 -DSCRIPTS=dynamic -DSERVERS=1 -DNOJEM=1
+  #  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\"
+  #  -DCMAKE_CXX_FLAGS=\"-Werror\" -DCMAKE_C_FLAGS_DEBUG=\"-DNDEBUG\"
+  #  -DCMAKE_CXX_FLAGS_DEBUG=\"-DNDEBUG\"
+  #  -DCMAKE_INSTALL_PREFIX=check_install",
+  fi
+
+  # TODO: Add support for ${cmdarg_cfg[clang]} to change compiler to clang.
+
+  # TODO: Add support for ${define[@]} -D values passed to cmake.
 
   declare cpus="$(nproc)"
   cmake ../ -DPREFIX=/artifacts -DTOOLS=1 -DWITH_WARNINGS=0 -Wno-dev ${boost_opts}

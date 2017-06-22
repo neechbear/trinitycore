@@ -34,8 +34,12 @@ RUN apt-get -qq update && \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
+
 COPY build.sh /
+RUN chmod +x /build.sh
+
 VOLUME /artifacts
 
 ENTRYPOINT ["/bin/bash", "/build.sh"]
+CMD ["-o", "/artifacts"]
 
