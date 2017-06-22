@@ -96,6 +96,9 @@ main() {
       printf '${cmdarg_cfg[%s]}=%q\n' "$i" "${cmdarg_cfg[$i]}"
     done
   fi
+  if [[ -n "${cmdarg_cfg[help]:-}" ]]; then
+    exit 0
+  fi
 
   declare source="/usr/local/src/${cmdarg_cfg[branch]}"
   mkdir -p "$source"
