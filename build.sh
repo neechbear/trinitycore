@@ -29,7 +29,6 @@ download_source() {
   declare tdb_tag="TDB${branch//[^0-9]/}"
   declare repo_url="https://github.com/${GITHUB_REPO%%.git}.git"
 
-  mkdir -p "$target"
   log_notice "Fetchhing $branch ($tdb_tag) ..."
 
   if [[ -r "${target}/database.url" ]]; then
@@ -51,7 +50,7 @@ download_source() {
 
   if [[ ! -s "${target}/${tdb_url##*/}" ]]; then
     echo "Downloading database $tdb_url ..."
-    curl -LO --progress-bar "$tdb_url"
+    curl -L --progress-bar -o "${target}/${tdb_url##*/}" "$tdb_url"
   fi
 }
 
@@ -65,6 +64,8 @@ main() {
   declare source="${BASH_SOURCE[0]%/*}/build/$version"
   declare artifacts="${BASH_SOURCE[0]%/*}/artifacts/$version"
 
+  mkdir -p "$source" "$artifacts"
+
   download_source "$source" "$version"
 
   log_notice "Building Docker build container ..."
@@ -72,7 +73,7 @@ main() {
   docker build -t "trinitycore/build:$version" "$source"
 
   log_notice "Building TrinityCore ..."
-  docker run --rm -v "$artifacts":/build "trinitycore/build:$version"
+  docker run --rm -v "$(readlink -f "$artifacts")":/build "trinitycore/build:$version"
 }
 
 main "$@"
