@@ -69,7 +69,7 @@ download_source() {
     echo "$tdb_url" > "$target/database.url"
   fi
 
-  log_notice "Fetchhing $branch ($tdb_tag) ..."
+  log_notice "Fetching $branch ($tdb_tag) ..."
   log_info " -> $repo_url ($branch branch)"
   log_info " -> $tdb_url"
 
