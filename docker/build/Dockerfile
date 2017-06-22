@@ -24,5 +24,5 @@ COPY build.sh /
 
 VOLUME /artifacts
 
-CMD ["/bin/bash", /build.sh"]
+CMD ["/bin/bash", "/build.sh"]
 
