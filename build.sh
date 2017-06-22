@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+log_notice() {
+  echo -e "\033[0;1;33m$*\033[0m"
+}
+
 main() {
   log_notice "Building Docker build container ..."
   docker build -t "trinitycore/build:latest" docker/build
