@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# MIT License
+# Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
+
 set -euo pipefail
 if ! source /usr/lib/blip.bash ; then
   >&2 echo "Missing dependency 'blip' (https://nicolaw.uk/blip); exiting!"
