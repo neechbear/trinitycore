@@ -15,6 +15,7 @@ RUN add-apt-repository ppa:nicolaw/blip && \
 RUN apt-get -qq update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y -qq -o Dpkg::Use-Pty=0 install \
     blip \
+    clang \
     cmake \
     g++ \
     gcc \
@@ -43,6 +44,6 @@ RUN chmod +x /build.sh
 
 VOLUME /artifacts
 
-ENTRYPOINT ["/bin/bash", "/build.sh"]
+ENTRYPOINT ["/build.sh"]
 CMD ["-o", "/artifacts"]
 
