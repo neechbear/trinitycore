@@ -156,22 +156,22 @@ build() {
   # TODO: Add support for ${define[@]} -D values passed to cmake.
 
   declare parallel_jobs="$(nproc)"
-  declare log_dir="${cmdarg_cfg[output]%/}/log"
-  declare log_time="$(printf "%(%FT%T%z)T" -2)"
-  mkdir -p "$log_dir"
+  #declare log_dir="${cmdarg_cfg[output]%/}/log"
+  #declare log_time="$(printf "%(%FT%T%z)T" -2)"
+  #mkdir -p "$log_dir"
 
   # Dependency configuration.
   cmake ../ "-DPREFIX=${cmdarg_cfg[output]}" -DTOOLS=1 -DWITH_WARNINGS=0 \
-    -Wno-dev ${boost_opts} \
-    2>&1 | tee -a "$log_dir/cmake-${log_time}.log"
+    -Wno-dev ${boost_opts}
+  #  2>&1 | tee -a "$log_dir/cmake-${log_time}.log"
 
   # Compilation
-  make -j "${parallel_jobs:-1}" \
-    2>&1 | tee -a "$log_dir/make-${log_time}.log"
+  make -j "${parallel_jobs:-1}"
+  #  2>&1 | tee -a "$log_dir/make-${log_time}.log"
 
   # Install binaries to artifact ouput directory.
-  make install \
-    2>&1 | tee -a "$log_dir/install-${log_time}.log"
+  make install
+  #  2>&1 | tee -a "$log_dir/install-${log_time}.log"
 }
 
 main() {
