@@ -16,7 +16,7 @@ _parse_command_line_arguments () {
   cmdarg_info "footer" \
     "See https://github.com/neechbear/trinitycore, https://neech.me.uk," \
     "https://github.com/neechbear/tcadmin, https://nicolaw.uk/#WoW and" \
-    "https://hub.docker.com/r/nicolaw/trinitycore-build."
+    "https://hub.docker.com/r/nicolaw/trinitycore."
 
   cmdarg 'o:'   'output'   'Output directory for finished build artifacts' '/artifacts'
   cmdarg 'b:'   'branch'   'Branch (version) of TrinityCore to build' '3.3.5'

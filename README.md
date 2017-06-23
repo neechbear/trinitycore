@@ -4,7 +4,7 @@ TrinityCore build environment and wrapper.
 
 ## Overview 
 
-Pull using `docker pull nicolaw/trinitycore-build`.
+Pull using `docker pull nicolaw/trinitycore`.
 
 Will attempt to build and create Docker service containers for TrinityCore 3.3.5
 branch (WotLK) by default. Source is pulled from
@@ -36,14 +36,14 @@ Command line help is available through --help option.
 
     See https://github.com/neechbear/trinitycore, https://neech.me.uk,
     https://github.com/neechbear/tcadmin, https://nicolaw.uk/#WoW and
-    https://hub.docker.com/r/nicolaw/trinitycore-build.
+    https://hub.docker.com/r/nicolaw/trinitycore.
 
 ## See Also
 
 Authors related works:
 
 * https://github.com/neechbear/trinitycore
-* https://hub.docker.com/r/nicolaw/trinitycore-build
+* https://hub.docker.com/r/nicolaw/trinitycore
 * https://github.com/neechbear/tcadmin
 * https://neech.me.uk
 * https://nicolaw.uk/#WoW
