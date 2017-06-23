@@ -22,10 +22,13 @@ trap 'declare rc=$?
 # We only expect to have to use this when the TrinityCore build breaks.
 drop_to_shell() {
   echo ""
-  echo -e "\033[0m  => \033[31mSources are in:   \033[1m$source"
-  echo -e "\033[0m  => \033[31mBuild root is in: \033[1m$source/build"
-  echo -e "\033[0m  => \033[31mArtifacts are in: \033[1m${cmdarg_cfg[output]}"
-  echo -e "\033[0m  => \033[31mBuild script is:  \033[1m$(cat /proc/$$/cmdline | tr '\000' ' ')"
+  if [[ -n "${cmdarg_cfg[reference]:-}" ]]; then
+    echo -e "\033[0m  => \033[31mRef. sources are in: \033[1m${cmdarg_cfg[reference]:-}"
+  fi
+  echo -e "\033[0m  => \033[31mSources are in:      \033[1m$source"
+  echo -e "\033[0m  => \033[31mBuild root is in:    \033[1m$source/build"
+  echo -e "\033[0m  => \033[31mArtifacts are in:    \033[1m${cmdarg_cfg[output]}"
+  echo -e "\033[0m  => \033[31mBuild script is:     \033[1m$(cat /proc/$$/cmdline | tr '\000' ' ')"
   echo ""
   echo -e "\033[0mType \"\033[31;1mcompgen -v\033[0m\" or \"\033[31;1mtypeset -x\033[0m\" to list variables."
   echo -e "\033[0mType \"\033[31;1mexit\033[0m\" or press \033[31;1mControl-D\033[0m to finish."
