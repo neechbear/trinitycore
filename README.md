@@ -14,6 +14,10 @@ https://trinitycore.atlassian.net/wiki/display/tc/Installation+Guide.
 
 Command line help is available through --help option.
 
+    $ docker pull nicolaw/trinitycore
+    $ mkdir artifacts
+    $ docker run -it --rm -v "$PWD/$artifacts":/artifacts trinitycore/build
+
 ## Synopsis
 
     build.sh version 1.0

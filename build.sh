@@ -17,7 +17,7 @@ main() {
   mkdir -p "$artifacts"
 
   log_notice "Building TrinityCore ..."
-  docker run -it --rm -v "$artifacts":/build "trinitycore/build:latest" "$@"
+  docker run -it --rm -v "$artifacts":/artifacts "trinitycore/build:latest" "$@"
 }
 
 main "$@"
