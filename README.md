@@ -20,6 +20,7 @@ Command line help is available through --help option.
 
 ## Synopsis
 
+    $ docker run --rm trinitycore/build --help
     build.sh version 1.0
     (C) 2017 Nicola Worthington. : Nicola Worthington <nicolaw@tfb.net>.
 
