@@ -13,9 +13,9 @@ if ! source /usr/lib/blip.bash ; then
 fi
 
 # Stacktrace on error, with optional dump to shell.
-trap 'declare rc=$?
+trap 'declare rc=$?; set +xvu
       >&2 echo "Unexpected error executing $BASH_COMMAND at ${BASH_SOURCE[0]} line $LINENO"
-      __blip_stacktrace__ >&2; set +u
+      __blip_stacktrace__ >&2
       [[ "${cmdarg_cfg[shell]:-}" == true ]] && drop_to_shell
       exit $rc' ERR
 
@@ -160,13 +160,16 @@ build() {
   declare log_time="$(printf "%(%FT%T%z)T" -2)"
   mkdir -p "$log_dir"
 
+  # Dependency configuration.
   cmake ../ "-DPREFIX=${cmdarg_cfg[output]}" -DTOOLS=1 -DWITH_WARNINGS=0 \
     -Wno-dev ${boost_opts} \
     2>&1 | tee -a "$log_dir/cmake-${log_time}.log"
 
+  # Compilation
   make -j "${parallel_jobs:-1}" \
     2>&1 | tee -a "$log_dir/make-${log_time}.log"
 
+  # Install binaries to artifact ouput directory.
   make install \
     2>&1 | tee -a "$log_dir/install-${log_time}.log"
 }
