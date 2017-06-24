@@ -49,7 +49,7 @@ log_notice() {
 
 log_success() {
   echo -e "\033[0;1;32m$*\033[0m"
-  sleep 2
+  sleep 3
 }
 
 is_directory() {
@@ -88,6 +88,7 @@ extract_map_data() {
   declare input="$1"
   declare output="$2"
 
+  pushd "$output"
   mkdir -p "${output%/}"/{dbc,maps,mmaps,vmaps,Buildings}
 
   # dbc, maps
@@ -113,6 +114,8 @@ extract_map_data() {
     fi
     mmaps_generator
   fi
+
+  popd
 }
 
 main() {
@@ -127,8 +130,8 @@ main() {
   _parse_command_line_arguments "$@" || exit $?
 
   # Build all maps, vmaps and mmaps is no specific option was specified.
-  if [[ "${cmdarg_cfg[maps]:-}" == false && "${cmdarg_cfg[vmaps]:-}" &&
-        "${cmdarg_cfg[mmaps]:-}" == false ]]; then
+  if [[ -z "${cmdarg_cfg[maps]:-}" && -z "${cmdarg_cfg[vmaps]:-}" && \
+        -z "${cmdarg_cfg[mmaps]:-}" ]]; then
     cmdarg_cfg[maps]=true
     cmdarg_cfg[vmaps]=true
     cmdarg_cfg[mmaps]=true
