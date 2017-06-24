@@ -2,3 +2,5 @@ build/*
 artifacts/*
 trinitycore-cache/*
 *.7z
+docker/authserver/authserver*
+docker/worldserver/worldserver*
