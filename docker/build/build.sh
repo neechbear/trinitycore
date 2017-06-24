@@ -83,6 +83,22 @@ get_tdb_url() {
               ] | max )"
 }
 
+extract_7z_archives() {
+  declare path="$1"
+  (
+    shopt -s nullglob
+    if declare zips=("${path%/}"/*.7z) && [[ -n "$zips" ]]; then
+      pushd "$path"
+      zip=""
+      for zip in "${z[@]}"; do
+        p7zip -d "$zip"
+      done
+      popd
+    fi
+    shopt -u nullglob
+  )
+}
+
 download_source() {
   declare target="${1%/}"
   declare branch="$2"
@@ -201,6 +217,7 @@ main() {
 
   # Copy build artifacts to output directory.
   cp -r "${define[CMAKE_INSTALL_PREFIX]%/}"/* "${cmdarg_cfg[output]%/}"/
+  extract_7z_archives "${cmdarg_cfg[output]%/}"
 }
 
 main "$@"
