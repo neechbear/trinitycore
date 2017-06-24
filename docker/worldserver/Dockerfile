@@ -21,6 +21,7 @@ ENV install_prefix /opt/trinitycore
 WORKDIR "${install_prefix}"
 VOLUME "${install_prefix}/etc"
 
+ADD data "${install_prefix}/bin/data"
 COPY worldserver "${install_prefix}/bin/worldserver"
 RUN chmod +x "${install_prefix}/bin/worldserver"
 

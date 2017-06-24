@@ -3,7 +3,7 @@
 # MIT License
 # Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
 
-set -Eauo pipefail
+set -Euo pipefail
 shopt -s extdebug
 
 # I'm a lazy and indolent 'programmer'.
@@ -27,7 +27,10 @@ drop_to_shell() {
           "creation, please see the TrinityCore documentation wiki at" \
           "https://goo.gl/wVUKrK."
   echo ""
-  echo -e "\033[0m  => \033[31mTools are in: \033[1m$PWD"
+  echo -e "\033[0m  => \033[31mInput WoW game client:     \033[1m${cmdarg_cfg[input]}"
+  echo -e "\033[0m  => \033[31mOutput map data artifacts: \033[1m${cmdarg_cfg[output]}"
+  echo -e "\033[0m  => \033[31mBuild script is:           \033[1m$(cat /proc/$$/cmdline | tr '\000' ' ')"
+  echo -e "\033[0m  => \033[31mTools are in:              \033[1m$PWD"
   echo ""
   echo -e "\033[0mType \"\033[31;1mcompgen -v\033[0m\" or \"\033[31;1mtypeset -x\033[0m\" to list variables."
   echo -e "\033[0mType \"\033[31;1mexit\033[0m\" or press \033[31;1mControl-D\033[0m to finish."
@@ -36,12 +39,20 @@ drop_to_shell() {
   exec "${BASH}" -i
 }
 
+log_error() {
+  >&2 echo -e "\033[0;1;31m$*\033[0m"
+}
+
 log_notice() {
   echo -e "\033[0;1;33m$*\033[0m"
 }
 
 log_info() {
   echo -e "\033[0;1m$*\033[0m"
+}
+
+is_directory() {
+  [[ -d "${1:-}" ]]
 }
 
 _parse_command_line_arguments () {
@@ -57,9 +68,19 @@ _parse_command_line_arguments () {
     "https://hub.docker.com/r/nicolaw/trinitycore and." \
     "https://www.youtube.com/channel/UCXDKo2buioQu_cqwIrxODpQ."
 
-  cmdarg 'v'    'verbose'   'Print more verbose debugging output'
+  cmdarg 'o:' 'output'  'Output directory for finished map data artifacts' '/artifacts' is_directory
+  cmdarg 'i:' 'input'   'Input directory containing WoW game client (and Data sub-directory)' '/World_of_Warcraft' is_directory
+  cmdarg 's'  'shell'   'Drop to a command line shell on errors'
+  cmdarg 'v'  'verbose' 'Print more verbose debugging output'
 
   cmdarg_parse "$@" || return $?
+}
+
+extract_map_data() {
+  declare input="$1"
+  declare output="$2"
+
+  mapextractor -i "$input" -o "$output" -e 7 -f 0
 }
 
 main() {
@@ -85,9 +106,17 @@ main() {
     exit 0
   fi
 
-  # For the time being (until this script is completed), just drop to the shell
-  # regardless of the command line arguments that we parsed.
-  drop_to_shell
+  # Exit early if we cannot find the Data input directory.
+  if [[ ! -d "${cmdarg_cfg[input]%/}/Data" ]]; then
+    log_error "Could not find Data sub-directory inside input game client" \
+              "directory '${cmdarg_cfg[input]}'."
+    log_notice "Try copying the Data directory from your World of Warcraft" \
+               "game client installation path, into ${cmdarg_cfg[input]}."
+    return 1
+  fi
+
+  # Extract the map data.
+  extract_map_data "${cmdarg_cfg[input]}" "${cmdarg_cfg[output]}"
 }
 
 main "$@"

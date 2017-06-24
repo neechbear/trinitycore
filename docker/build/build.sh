@@ -44,6 +44,10 @@ log_info() {
   echo -e "\033[0;1m$*\033[0m"
 }
 
+is_directory() {
+  [[ -d "${1:-}" ]]
+}
+
 _parse_command_line_arguments () {
   cmdarg_info "header" "TrinityCore Dockerised build wrapper."
   cmdarg_info "version" "1.0"
@@ -57,11 +61,11 @@ _parse_command_line_arguments () {
     "https://hub.docker.com/r/nicolaw/trinitycore and" \
     "https://www.youtube.com/channel/UCXDKo2buioQu_cqwIrxODpQ."
 
-  cmdarg 'o:'   'output'    'Output directory for finished build artifacts' '/artifacts'
+  cmdarg 'o:'   'output'    'Output directory for finished build artifacts' '/artifacts' is_directory
   cmdarg 'b:'   'branch'    'Branch (version) of TrinityCore to build' '3.3.5'
   cmdarg 't?'   'tdb'       'TDB database release archive URL to download'
   cmdarg 'r:'   'repo'      'Git repository to clone from' 'https://github.com/TrinityCore/TrinityCore.git'
-  cmdarg 'R?'   'reference' 'Reference Git repository on local machine'
+  cmdarg 'R?'   'reference' 'Cached reference Git repository on local machine'
   cmdarg 'D?{}' 'define'    'Supply additional -D arguments to cmake'
   cmdarg 'd'    'debug'     'Produce a debug build'
   cmdarg 's'    'shell'     'Drop to a command line shell on errors'

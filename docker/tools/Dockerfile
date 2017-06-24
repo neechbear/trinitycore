@@ -26,9 +26,9 @@ RUN apt-get -qq update && \
  && rm -rf /var/lib/apt/lists/*
 
 ENV install_prefix /opt/trinitycore
+ENV PATH "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${install_prefix}/bin"
 
 WORKDIR "${install_prefix}/bin"
-VOLUME "${install_prefix}/etc"
 
 COPY tools.sh /tools.sh
 
@@ -39,5 +39,8 @@ COPY vmap4extractor "${install_prefix}/bin/vmap4extractor"
 
 RUN chmod +x "${install_prefix}/bin"/* /tools.sh
 
+VOLUME /artifacts
+
 ENTRYPOINT ["/tools.sh"]
+CMD ["-o", "/artifacts", "-i", "/World_of_Warcraft"]
 
