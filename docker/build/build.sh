@@ -117,6 +117,8 @@ download_source() {
     echo "Downloading database $tdb_url ..."
     curl -L --progress-bar -o "$target/${tdb_url##*/}" "$tdb_url"
   fi
+
+  cp "$target/${tdb_url##*/}" "${cmdarg_cfg[output]%/}"/
 }
 
 define_args() {
