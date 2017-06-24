@@ -45,7 +45,7 @@ log_info() {
 }
 
 _parse_command_line_arguments () {
-  cmdarg_info "header" "TrinityCore Dockerised build wrapper."
+  cmdarg_info "header" "TrinityCore map extration tools wrapper."
   cmdarg_info "version" "1.0"
 
   cmdarg_info "author" "Nicola Worthington <nicolaw@tfb.net>."
@@ -53,8 +53,9 @@ _parse_command_line_arguments () {
 
   cmdarg_info "footer" \
     "See https://github.com/neechbear/trinitycore, https://neech.me.uk," \
-    "https://github.com/neechbear/tcadmin, https://nicolaw.uk/#WoW and" \
-    "https://hub.docker.com/r/nicolaw/trinitycore."
+    "https://github.com/neechbear/tcadmin, https://nicolaw.uk/#WoW," \
+    "https://hub.docker.com/r/nicolaw/trinitycore and." \
+    "https://www.youtube.com/channel/UCXDKo2buioQu_cqwIrxODpQ."
 
   cmdarg 'v'    'verbose'   'Print more verbose debugging output'
 

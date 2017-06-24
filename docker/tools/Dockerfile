@@ -30,14 +30,14 @@ ENV install_prefix /opt/trinitycore
 WORKDIR "${install_prefix}/bin"
 VOLUME "${install_prefix}/etc"
 
-COPY entrypoint.sh /entrypoint.sh
+COPY tools.sh /tools.sh
 
 COPY mapextractor "${install_prefix}/bin/mapextractor"
 COPY mmaps_generator "${install_prefix}/bin/mmaps_generator"
 COPY vmap4assembler "${install_prefix}/bin/vmap4assembler"
 COPY vmap4extractor "${install_prefix}/bin/vmap4extractor"
 
-RUN chmod +x "${install_prefix}/bin"/* /entrypoint.sh
+RUN chmod +x "${install_prefix}/bin"/* /tools.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/tools.sh"]
 
