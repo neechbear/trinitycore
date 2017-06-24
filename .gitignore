@@ -1,5 +1,8 @@
 artifacts/*
 trinitycore-cache/*
+wowdata/*
+Data/*
+World of Warcraft/*
 *.7z
 docker/authserver/authserver*
 docker/worldserver/worldserver*
