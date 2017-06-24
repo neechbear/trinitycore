@@ -84,19 +84,27 @@ _parse_command_line_arguments () {
   cmdarg_parse "$@" || return $?
 }
 
+directory_min_filecount() {
+  declare path="$1"
+  declare count="$2"
+  [[ $(find "$path" -type f 2>/dev/null | wc -l) -ge $count ]]
+}
+
 extract_map_data() {
   declare input="$1"
   declare output="$2"
 
   pushd "$output"
-  mkdir -p "${output%/}"/{dbc,maps,mmaps,vmaps,Buildings}
+  mkdir -p "${output%/}"/{dbc,maps,mmaps,vmaps,Buildings,Cameras}
 
   # dbc, maps
   if [[ "${cmdarg_cfg[maps]}" == true ]]; then
-    if mapextractor -i "$input" -o "$output" -e 7 -f 0 &&
-      [[ $(find "${output%/}/maps" -type f -name '*.map' | wc -l) -ge 5700 ]]
-    then
+    mapextractor -i "$input" -o "$output" -e 7 -f 0
+    if directory_min_filecount "$output/maps" 5700 && \
+       directory_min_filecount "$output/dbc" 240; then
       log_success "Map extraction succeeded."
+    else
+      log_notice "Map extraction may have failed."
     fi
   fi
 
@@ -104,6 +112,11 @@ extract_map_data() {
   if [[ "${cmdarg_cfg[vmaps]}" == true ]]; then
     vmap4extractor -l -d "${input%/}/Data"
     vmap4assembler "${output%/}/Buildings" "${output%/}/vmaps"
+    if directory_min_filecount "$output/vmaps" 9800; then
+      log_success "Visual map (vmap) extraction succeeded."
+    else
+      log_notice "Visual map (vmap) may have failed."
+    fi
   fi
 
   # mmaps
@@ -113,6 +126,11 @@ extract_map_data() {
                  "(vmap) generation to completed first."
     fi
     mmaps_generator
+    if directory_min_filecount "$output/vmaps" 3600; then
+      log_success "Movement map (mmap) extraction succeeded."
+    else
+      log_notice "Movement map (mmap) may have failed."
+    fi
   fi
 
   popd

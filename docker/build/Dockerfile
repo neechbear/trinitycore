@@ -23,7 +23,7 @@ RUN apt-get -qq update && \
     git \
     jq \
     make \
-    p7zip \
+    p7zip-full \
     libboost1.55-dev \
     libboost-filesystem1.55-dev \
     libboost-iostreams1.55-dev \

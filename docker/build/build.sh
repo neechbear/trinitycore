@@ -92,11 +92,11 @@ extract_7z_archives() {
   declare path="$1"
   (
     shopt -s nullglob
-    if declare zips=("${path%/}"/*.7z) && [[ -n "$zips" ]]; then
+    if declare zips=("${path%/}"/*.7z) && [[ -n "${zips[@]}" ]]; then
       pushd "$path"
       zip=""
-      for zip in "${z[@]}"; do
-        p7zip -d "$zip"
+      for zip in "${zips[@]}"; do
+        7z x "$zip"
       done
       popd
     fi
@@ -135,11 +135,11 @@ download_source() {
   fi
 
   if [[ ! -s "$target/${tdb_url##*/}" ]]; then
+    mkdir -p "$target/sql"
     echo "Downloading database $tdb_url ..."
-    curl -L --progress-bar -o "$target/${tdb_url##*/}" "$tdb_url"
+    curl -L --progress-bar -o "$target/sql/${tdb_url##*/}" "$tdb_url"
+    extract_7z_archives "$target/sql"
   fi
-
-  cp "$target/${tdb_url##*/}" "${cmdarg_cfg[output]%/}"/
 }
 
 define_args() {
@@ -212,7 +212,7 @@ main() {
   fi
 
   # Download source in to /usr/local/src/.
-  declare -g source="/usr/local/src/${cmdarg_cfg[branch]}"
+  declare -g source="/usr/local/src/${cmdarg_cfg[branch]//[^a-zA-Z0-9\._-]/}"
   mkdir -p "$source"
   download_source "$source" \
     "${cmdarg_cfg[branch]}" "${cmdarg_cfg[repo]}" "${cmdarg_cfg[tdb]}"
@@ -222,7 +222,16 @@ main() {
 
   # Copy build artifacts to output directory.
   cp -r "${define[CMAKE_INSTALL_PREFIX]%/}"/* "${cmdarg_cfg[output]%/}"/
-  extract_7z_archives "${cmdarg_cfg[output]%/}"
+
+  # Copy SQL artifacts to output directory.
+  mkdir -p "${cmdarg_cfg[output]%/}/sql"
+  cp -r "$source/sql/"* "${cmdarg_cfg[output]%/}/sql/"
+  cp -r "$source/trinitycore/sql/"* "${cmdarg_cfg[output]%/}/sql/"
+
+  # "This should be OK for us."
+  # https://nicolaw.uk/this_should_be_OK_for_us
+  find "${cmdarg_cfg[output]}" -type d -exec chmod a+x '{}' \;
+  chmod -R a+rw "${foo//[^a-zA-Z0-9\._-]/}"
 }
 
 main "$@"
