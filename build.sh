@@ -44,7 +44,7 @@ local_cache_build() {
     -v "$cache":/reference \
     nicolaw/trinitycore \
       --shell --verbose --reference=/reference \
-      --tdb "file:///reference/${2##*/}"
+      --tdb "file:///reference/${2##*/}" "$@"
 }
 
 main() {

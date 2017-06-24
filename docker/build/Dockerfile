@@ -12,28 +12,31 @@ RUN apt-get -qq update && \
 RUN add-apt-repository ppa:nicolaw/blip && \
     sed -i 's/jessie/trusty/g' /etc/apt/sources.list.d/nicolaw-blip-jessie.list
 
+# https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
+# https://trinitycore.atlassian.net/wiki/display/tc/Requirements
 RUN apt-get -qq update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y -qq -o Dpkg::Use-Pty=0 install \
     blip \
-    clang \
     cmake \
     g++ \
     gcc \
     git \
     jq \
-    libboost-dev \
-    libboost-thread-dev \
-    libboost-system-dev \
-    libboost-filesystem-dev \
-    libboost-program-options-dev \
-    libbz2-dev \
-    libmysqlclient-dev \
-    libncurses-dev \
-    libreadline-dev \
-    libssl-dev \
     make \
     p7zip \
+    libboost1.55-dev \
+    libboost-filesystem1.55-dev \
+    libboost-iostreams1.55-dev \
+    libboost-program-options1.55-dev \
+    libboost-regex1.55-dev \
+    libboost-system1.55-dev \
+    libboost-thread1.55-dev \
+    libssl-dev \
+    libmysqlclient-dev \
+    libreadline6-dev \
     zlib1g-dev \
+    libbz2-dev \
+    libncurses5-dev \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
 

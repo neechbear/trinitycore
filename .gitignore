@@ -1,3 +1,4 @@
 build/*
 artifacts/*
 trinitycore-cache/*
+*.7z

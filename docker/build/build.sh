@@ -61,7 +61,7 @@ _parse_command_line_arguments () {
   cmdarg 't?'   'tdb'       'TDB database release archive URL to download'
   cmdarg 'r:'   'repo'      'Git repository to clone from' 'https://github.com/TrinityCore/TrinityCore.git'
   cmdarg 'R?'   'reference' 'Reference Git repository on local machine'
-  cmdarg 'D?[]' 'define'    'Supply additional -D arguments to cmake'
+  cmdarg 'D?{}' 'define'    'Supply additional -D arguments to cmake'
   cmdarg 'd'    'debug'     'Produce a debug build'
   cmdarg 's'    'shell'     'Drop to a command line shell on errors'
   cmdarg 'c'    'clang'     'Use clang compiler instead of gcc'
@@ -99,7 +99,6 @@ download_source() {
   fi
   if [[ -z "${tdb_url:-}" ]] ; then
     declare $(get_tdb_url "$tdb_tag")
-    echo "$tdb_url" > "$target/database.url"
   fi
 
   log_notice "Fetching $branch ${tdb_tag:+($tdb_tag) }..."
@@ -120,68 +119,66 @@ download_source() {
   fi
 }
 
-build() {
-  # https://askubuntu.com/questions/828989/cmake-cant-find-boost
-  declare boost_opts=""
-  declare pkg=""
-  for pkg in system filesystem thread program_options iostreams regex
-  do
-    declare pkg_path="/usr/include/boost/${pkg}"
-    if [[ -d "$pkg_path" ]]; then
-      boost_opts+="-DBoost_${pkg^^}_LIBRARY=$pkg_path "
-    fi
+define_args() {
+  declare key=""
+  for key in "${!define[@]}"; do
+    printf -- '-D%q=%q ' "$key" "${define[$key]}"
   done
-  unset pkg
+}
 
-  # https://trinitycore.atlassian.net/wiki/display/tc/Linux+Core+Installation
+build() {
   mkdir -p "$source/trinitycore/build"
   cd "$source/trinitycore/build"
 
+  # Turn on --debug preset cmake arguments.
   if [[ "${cmdarg_cfg[debug]}" == true ]]; then
-    :
-  # TODO: Work out what extra debug stuff to add from
-  #       https://travis-ci.org/TrinityCore/TrinityCore/jobs/245949532/config
-  #       https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
-  #
-  #  "cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1
-  #  -DUSE_SCRIPTPCH=1 -DTOOLS=1 -DSCRIPTS=dynamic -DSERVERS=1 -DNOJEM=1
-  #  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\"
-  #  -DCMAKE_CXX_FLAGS=\"-Werror\" -DCMAKE_C_FLAGS_DEBUG=\"-DNDEBUG\"
-  #  -DCMAKE_CXX_FLAGS_DEBUG=\"-DNDEBUG\"
-  #  -DCMAKE_INSTALL_PREFIX=check_install",
+    # https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
+    # https://trinitycore.atlassian.net/wiki/display/tc/Linux+Core+Installation
+    define[WITH_WARNINGS]=1
+    define[WITH_COREDEBUG]=0 # What does this do, and why is it 0 on a debug build?
+    define[CMAKE_BUILD_TYPE]="Debug"
+    define[CMAKE_C_FLAGS]="-Werror"
+    define[CMAKE_CXX_FLAGS]="-Werror"
+    define[CMAKE_C_FLAGS_DEBUG]="-DNDEBUG"
+    define[CMAKE_CXX_FLAGS_DEBUG]="-DNDEBUG"
+  fi
+
+  # Miscellaneous cmake arguments.
+  declare -a extra_cmake_args=()
+  if [[ "${define[WITH_WARNINGS]}" == "0" ]]; then
+    extra_cmake_args+=("-Wno-dev")
   fi
 
   # TODO: Add support for ${cmdarg_cfg[clang]} to change compiler to clang.
 
-  # TODO: Add support for ${define[@]} -D values passed to cmake.
+  # Report our define -D settings.
+  declare i=""
+  for i in "${!define[@]}" ; do
+    printf '${define[%q]}=%q\n' "$i" "${define[$i]}"
+  done
+  unset i
+
+  log_notice "Will compile with: $(define_args)${extra_cmake_args[@]:-}"
 
   declare parallel_jobs="$(nproc)"
-  #declare log_dir="${cmdarg_cfg[output]%/}/log"
-  #declare log_time="$(printf "%(%FT%T%z)T" -2)"
-  #mkdir -p "$log_dir"
-
-  # Dependency configuration.
-  cmake ../ "-DPREFIX=${cmdarg_cfg[output]}" -DTOOLS=1 -DWITH_WARNINGS=0 \
-    -Wno-dev ${boost_opts}
-  #  2>&1 | tee -a "$log_dir/cmake-${log_time}.log"
-
-  # Compilation
+  cmake ../ $(define_args) ${extra_cmake_args[@]:-}
   make -j "${parallel_jobs:-1}"
-  #  2>&1 | tee -a "$log_dir/make-${log_time}.log"
-
-  # Install binaries to artifact ouput directory.
   make install
-  #  2>&1 | tee -a "$log_dir/install-${log_time}.log"
 }
 
 main() {
   # Parse command line options.
   declare -gA cmdarg_cfg=()
-  declare -ga define=()
+  declare -gA define=(
+      [TOOLS]=1
+      [WITH_WARNINGS]=0
+      [CMAKE_INSTALL_PREFIX]=/opt/trinitycore
+    )
   _parse_command_line_arguments "$@" || exit $?
 
   # Report command line options and help.
   if [[ -n "${cmdarg_cfg[verbose]}" || -n "${DEBUG:-}" ]] ; then
+    declare i=""
     for i in "${!cmdarg_cfg[@]}" ; do
       printf '${cmdarg_cfg[%s]}=%q\n' "$i" "${cmdarg_cfg[$i]}"
     done
@@ -199,6 +196,9 @@ main() {
 
   # Build TrinityCore.
   build
+
+  # Copy build artifacts to output directory.
+  cp -r "${define[CMAKE_INSTALL_PREFIX]%/}"/* "${cmdarg_cfg[output]%/}"/
 }
 
 main "$@"
