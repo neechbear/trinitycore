@@ -222,6 +222,12 @@ main() {
 
   # Copy build artifacts to output directory.
   cp -r "${define[CMAKE_INSTALL_PREFIX]%/}"/* "${cmdarg_cfg[output]%/}"/
+  declare conf_dist=""
+  for conf_dist in "${cmdarg_cfg[output]%/}"/etc/*.conf.dist ; do
+    if [[ ! -e "${conf_dist%%.conf.dist}.conf}" ]]; then
+      cp "$conf_dist" "${conf_dist%%.conf.dist}.conf}"
+    fi
+  done
 
   # Copy SQL artifacts to output directory.
   mkdir -p "${cmdarg_cfg[output]%/}/sql"

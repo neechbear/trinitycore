@@ -13,17 +13,19 @@ RUN apt-get -qq update && \
     libboost-thread1.55 \
     libssl1.0.0 \
     libmysqlclient18 \
+    netcat \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
 
 ENV install_prefix /opt/trinitycore
 
 WORKDIR "${install_prefix}"
-VOLUME "${install_prefix}/etc"
 
-ADD data "${install_prefix}/bin/data"
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh "${install_prefix}/bin/wait-for-it.sh"
+COPY worldserver.sh "${install_prefix}/bin/worldserver.sh"
 COPY worldserver "${install_prefix}/bin/worldserver"
-RUN chmod +x "${install_prefix}/bin/worldserver"
 
-ENTRYPOINT ["bin/worldserver"]
+RUN chmod +x "${install_prefix}/bin"/*
+
+ENTRYPOINT ["bin/worldserver.sh"]
 

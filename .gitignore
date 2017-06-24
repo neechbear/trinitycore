@@ -5,8 +5,8 @@ Data/*
 data/*
 World of Warcraft/*
 *.7z
-docker/authserver/authserver*
-docker/worldserver/worldserver*
+docker/authserver/authserver
+docker/worldserver/worldserver
 docker/worldserver/data/*
 docker/tools/mapextractor
 docker/tools/mmaps_generator

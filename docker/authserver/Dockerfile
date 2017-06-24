@@ -13,6 +13,7 @@ RUN apt-get -qq update && \
     libboost-thread1.55 \
     libssl1.0.0 \
     libmysqlclient18 \
+    netcat \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
 
@@ -21,8 +22,11 @@ ENV install_prefix /opt/trinitycore
 WORKDIR "${install_prefix}"
 VOLUME "${install_prefix}/etc"
 
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh "${install_prefix}/bin/wait-for-it.sh"
+COPY authserver.sh "${install_prefix}/bin/authserver.sh"
 COPY authserver "${install_prefix}/bin/authserver"
-RUN chmod +x "${install_prefix}/bin/authserver"
 
-ENTRYPOINT ["bin/authserver"]
+RUN chmod +x "${install_prefix}/bin"/*
+
+ENTRYPOINT ["bin/authserver.sh"]
 

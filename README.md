@@ -72,6 +72,18 @@ Here you are pre-downloading both the TrinityCore database archive files, and
 Git repository. The `--shell` option will drop you to a Bash shell prompt if the
 build fails if you interrupt the build script by pressing Control-C.
 
+## Running TrinityCore After Compilation
+
+Once you have built TrinityCore, and have a build artifact directory with lots
+of yummy binaries and SQL files, you will probably want to start up a
+TrinityCore server!
+
+Try using the `docker-compose.yaml` profile at
+https://github.com/neechbear/trinitycore/blob/master/docker/docker-compose.yaml.
+
+Full instructions on what to do next can be found in the README.md at 
+https://github.com/neechbear/trinitycore/blob/master/docker/README.md.
+
 ## See Also
 
 Authors related works:
@@ -90,6 +102,9 @@ Related TrinityCore projects:
     * https://github.com/TrinityCore/aowow
 * https://github.com/Sarjuuk/aowow
   * https://db.rising-gods.de
+
+Initial inspiration taken from Jose Falcon's project
+https://github.com/neechbear/josefalcon-trinitycore-docker.
 
 ## License
 
