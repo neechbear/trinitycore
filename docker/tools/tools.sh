@@ -80,7 +80,17 @@ extract_map_data() {
   declare input="$1"
   declare output="$2"
 
+  mkdir -p "${output%/}"/{dbc,maps,mmaps,vmaps,Buildings}
+
+  # dbc, maps
   mapextractor -i "$input" -o "$output" -e 7 -f 0
+
+  # vmaps
+  vmap4extractor -l -d "${input%/}/Data"
+  vmap4assembler "${output%/}/Buildings" "${output%/}/vmaps"
+
+  # mmaps
+  mmaps_generator
 }
 
 main() {
