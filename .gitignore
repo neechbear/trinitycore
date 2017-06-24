@@ -1,6 +1,9 @@
-build/*
 artifacts/*
 trinitycore-cache/*
 *.7z
 docker/authserver/authserver*
 docker/worldserver/worldserver*
+docker/tools/mapextractor
+docker/tools/mmaps_generator
+docker/tools/vmap4assembler
+docker/tools/vmap4extractor
