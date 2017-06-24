@@ -18,6 +18,9 @@ Command line help is available through --help option.
     $ mkdir artifacts
     $ docker run -it --rm -v "$PWD/artifacts":/artifacts nicolaw/trinitycore
 
+YouTube video demonstration for beginners can be viewed at
+https://www.youtube.com/watch?v=bd7xFsGoAEk.
+
 ## Synopsis
 
     $ docker run --rm trinitycore/build --help
