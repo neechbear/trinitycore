@@ -14,7 +14,7 @@ package() {
 
   fpm \
     --input-type dir \
-    --output-type deb \
+    --output-type "$type" \
     --name trinitycore-mapdata --version 3.3.5 \
     --verbose \
     --url "https://www.trinitycore.org" \
