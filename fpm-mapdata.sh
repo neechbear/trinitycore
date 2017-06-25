@@ -18,9 +18,11 @@ package() {
     --name trinitycore-mapdata --version 3.3.5 \
     --verbose \
     --url "https://www.trinitycore.org" \
+    --maintainer "TrinityCore" \
     --category "Amusements/Games" \
     --vendor "TrinityCore" \
     --description "TrinityCore world server map data" \
+    --architecture "all" \
     --directories "/opt/trinitycore/$source" \
     "$source"=/opt/trinitycore
 
