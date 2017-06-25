@@ -18,19 +18,20 @@ services:
       - mariadb:mysql
     ports:
       - "8085:8085"
-      - "8086:8086"
+      - "3443:3443"
+      - "7878:7878"
     volumes:
       - ../../artifacts/etc:/opt/trinitycore/etc
       - ../../artifacts/mapdata:/opt/trinitycore/data
+      - ../../artifacts/sql:/opt/trinitycore/sql
   mariadb:
     image: "mariadb:latest"
     environment:
       - MYSQL_ROOT_PASSWORD=okgreat
-      - MYSQL_DATABASE=auth
       - MYSQL_USER=trinity
       - MYSQL_PASSWORD=trinity
     ports:
       - "3307:3306"
     volumes:
       - ../../artifacts/mysql:/var/lib/mysql
-      - ../../artifacts/sql:/sql
+      - ../../artifacts/sql/import:/docker-entrypoint-initdb.d

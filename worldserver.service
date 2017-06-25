@@ -1,0 +1,16 @@
+[Unit]
+Description=worldserver
+Requires=authserver.service
+
+[Service]
+ExecStart=/opt/trinitycore/server/bin/worldserver
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=trinity
+User=trinity
+Group=trinity
+
+[Install]
+WantedBy=multi-user.target

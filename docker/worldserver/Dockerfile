@@ -13,6 +13,7 @@ RUN apt-get -qq update && \
     libboost-thread1.55 \
     libssl1.0.0 \
     libmysqlclient18 \
+    mysql-client \
     netcat \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*

@@ -1,0 +1,31 @@
+# https://us.battle.net/support/en/article/300479
+# Copy this file into /etc/ufw/applications.d, then run:
+#   ufw reload
+#   ufw app list
+#   ufw allow from "$net" to any app "$app"
+
+[TrinityCore AuthServer]
+title=TrinityCore AuthServer
+description=World of Warcraft private server
+ports=3724/tcp
+
+[TrinityCore BattleNet]
+title=TrinityCore AuthServer BattleNet RealID
+description=World of Warcraft private server
+ports=1119/tcp
+
+[TrinityCore WorldServer]
+title=TrinityCore WoldServer
+description=World of Warcraft private server
+ports=8085/tcp
+
+[TrinityCore WorldServer Console]
+title=TrinityCore WorldServer Remote Console
+description=World of Warcraft private server
+ports=3443/tcp
+
+[TrinityCore WorldServer SOAP]
+title=TrinityCore WorldServer SOAP API
+description=World of Warcraft private server
+ports=7878/tcp
+

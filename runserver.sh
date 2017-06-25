@@ -21,7 +21,8 @@ main() {
   fi
 
   pushd "${BASH_SOURCE[0]%/*}/docker/trinitycore"
-  docker-compose up
+  docker-compose up --build
+  docker-compose rm
   popd
 }
 
