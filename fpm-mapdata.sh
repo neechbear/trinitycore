@@ -31,6 +31,11 @@ package() {
 }
 
 main() {
+  if ! type -P fpm >/dev/null 2>&1 ; then
+    >&2 echo "Install fpm first (see https://fpm.readthedocs.io/); exiting!"
+    exit 1
+  fi
+
   pushd "${BASH_SOURCE[0]%/*}/artifacts"
   package "mapdata" "${1:-deb}"
   popd
