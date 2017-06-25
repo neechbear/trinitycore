@@ -3,7 +3,7 @@
 # MIT License
 # Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
 
-set -euo pipefail
+set -Euo pipefail
 
 ufw_applications() {
   cat <<EOM
@@ -16,7 +16,16 @@ EOM
 }
 
 my_networks() {
-  cat "${BASH_SOURCE[0]%/*}/.networks"
+  if [[ ! -e "${BASH_SOURCE[0]%/*}/.networks" ]]; then
+    cat <<EOM
+127.0.0.1/32
+10.0.0.0/8
+192.168.0.0/16
+172.16.0.0/12
+EOM
+  else
+    cat "${BASH_SOURCE[0]%/*}/.networks"
+  fi
 }
 
 main() {
