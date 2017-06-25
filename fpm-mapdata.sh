@@ -17,7 +17,7 @@ package() {
     --verbose \
     --url="https://www.trinitycore.org" \ 
     --category "Amusements/Games" \
-    --vendor "TrinityCore"
+    --vendor "TrinityCore" \
     --directories "/opt/trinitycore/$source" \
     "$source"=/opt/trinitycore
 }
