@@ -16,15 +16,15 @@ EOM
 }
 
 my_networks() {
-  if [[ ! -e "${BASH_SOURCE[0]%/*}/.networks" ]]; then
+  if [[ -e "${BASH_SOURCE[0]%/*}/.networks" ]]; then
+    cat "${BASH_SOURCE[0]%/*}/.networks"
+  else
     cat <<EOM
 127.0.0.1/32
 10.0.0.0/8
 192.168.0.0/16
 172.16.0.0/12
 EOM
-  else
-    cat "${BASH_SOURCE[0]%/*}/.networks"
   fi
 }
 
