@@ -20,6 +20,7 @@ package() {
     --url "https://www.trinitycore.org" \
     --category "Amusements/Games" \
     --vendor "TrinityCore" \
+    --description "TrinityCore world server map data" \
     --directories "/opt/trinitycore/$source" \
     "$source"=/opt/trinitycore
 
