@@ -5,6 +5,7 @@ Data/*
 data/*
 World of Warcraft/*
 *.7z
+.networks
 docker/authserver/authserver
 docker/worldserver/worldserver
 docker/worldserver/data/*
