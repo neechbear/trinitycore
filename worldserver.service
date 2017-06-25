@@ -3,7 +3,7 @@ Description=worldserver
 Requires=authserver.service
 
 [Service]
-ExecStart=/opt/trinitycore/server/bin/worldserver
+ExecStart=/opt/trinitycore/bin/worldserver
 Restart=always
 RestartSec=10
 StandardOutput=syslog

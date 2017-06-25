@@ -2,7 +2,7 @@
 Description=authserver
 
 [Service]
-ExecStart=/opt/trinitycore/server/bin/authserver
+ExecStart=/opt/trinitycore/bin/authserver
 Restart=always
 RestartSec=10
 StandardOutput=syslog
