@@ -31,7 +31,7 @@ package() {
 
 main() {
   pushd "${BASH_SOURCE[0]%/*}/artifacts"
-  package "mapdata" "deb"
+  package "mapdata" "${1:-deb}"
   popd
 }
 
