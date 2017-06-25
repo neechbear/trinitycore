@@ -133,6 +133,7 @@ download_source() {
   else
     git -C "$target/trinitycore" pull
   fi
+  git -C "$target/trinitycore" fetch -t
 
   if [[ ! -s "$target/${tdb_url##*/}" ]]; then
     mkdir -p "$target/sql"
@@ -233,6 +234,10 @@ main() {
   mkdir -p "${cmdarg_cfg[output]%/}/sql"
   cp -r "$source/sql/"* "${cmdarg_cfg[output]%/}/sql/"
   cp -r "$source/trinitycore/sql/"* "${cmdarg_cfg[output]%/}/sql/"
+
+  # Save Git revision.
+  git -C "$source" rev-parse short HEAD > "${cmdarg_cfg[output]%/}/git-rev"
+  git -C "$source" rev-parse --short HEAD > "${cmdarg_cfg[output]%/}/git-rev-short"
 
   # "This should be OK for us."
   # https://nicolaw.uk/this_should_be_OK_for_us

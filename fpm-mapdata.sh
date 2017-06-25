@@ -16,6 +16,7 @@ package() {
     --input-type dir \
     --output-type "$type" \
     --name trinitycore-mapdata --version 3.3.5 \
+    --iteration \
     --verbose \
     --url "https://www.trinitycore.org" \
     --maintainer "TrinityCore" \
