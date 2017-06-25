@@ -1,4 +1,6 @@
 artifacts/*
+*.deb
+*.rpm
 trinitycore-cache/*
 wowdata/*
 Data/*

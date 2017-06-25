@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# MIT License
+# Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
 
 set -euo pipefail
 
