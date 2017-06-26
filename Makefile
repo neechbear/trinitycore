@@ -12,9 +12,9 @@ PKGTYPE = deb
 
 # Enable worldserver remote access and SOAP API by default.
 WORLDSERVER_RA = 1
-WORLDSERVER_RA_IP = "0.0.0.0"
+WORLDSERVER_RA_IP = 0.0.0.0
 WORLDSERVER_SOAP = 1
-WORLDSERVER_SOAP_IP = "0.0.0.0"
+WORLDSERVER_SOAP_IP = 0.0.0.0
 
 # TrinityCore binary and config files.
 TOOLS = mapextractor mmaps_generator vmap4assembler vmap4extractor
