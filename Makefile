@@ -10,6 +10,12 @@ DBPORT = 3306
 # Package type to build for map data. (Optional step).
 PKGTYPE = deb
 
+# Enable worldserver remote access and SOAP API by default.
+WORLDSERVER_RA = 1
+WORLDSERVER_RA_IP = "0.0.0.0"
+WORLDSERVER_SOAP = 1
+WORLDSERVER_SOAP_IP = "0.0.0.0"
+
 # TrinityCore binary and config files.
 TOOLS = mapextractor mmaps_generator vmap4assembler vmap4extractor
 BINARIES = $(addprefix artifacts/bin/, $(TOOLS) authserver worldserver)
@@ -41,7 +47,7 @@ MPQ = $(addprefix $(GAMEDATA)/Data/, $(addsuffix .MPQ, \
 	enUS/expansion-locale-enUS enUS/base-enUS enUS/patch-enUS-2 enUS/backup-enUS \
 	enUS/speech-enUS enUS/patch-enUS-3 enUS/patch-enUS enUS/locale-enUS ) )
 
-.PHONY: run build clean help mapdata_deb mapdata_rpm mapdata
+.PHONY: run build springclean clean help mapdata_deb mapdata_rpm mapdata
 .DEFAULT_GOAL := help
 
 help:
@@ -65,6 +71,9 @@ mapdata: $(MAPDATA)
 clean:
 	rm -Rf artifacts source
 
+springclean:
+	rm -Rf artifacts/mysql/* $(CONF) docker/worldserver/*.sql docker/worldserver/worldserver docker/authserver/authserver $(dir $(SQL_IMPORT))
+
 $(TDB_WORLDSERVER_FILES):
 	cp -r artifacts/sql/TDB_*/"$(notdir $@)" docker/worldserver
 
@@ -79,6 +88,10 @@ $(CONF):
 		  -e 's!^DataDir\s*=.*!DataDir = "$(MAPDATA_DIR)"!g;' \
 			-e 's!^SourceDirectory\s*=.*!SourceDirectory = "$(INSTALL_PREFIX)"!g;' \
 			-e 's!^BuildDirectory\s*=.*!BuildDirectory = "$(INSTALL_PREFIX)/source/TrinityCore/build"!g;' \
+			-e 's!^Ra\.Enable\s*=.*!Ra.Enable = $(WORLDSERVER_RA)!g;' \
+			-e 's!^Ra\.IP\s*=.*!Ra.IP = "$(WORLDSERVER_RA_IP)"!g;' \
+			-e 's!^SOAP\.Enabled\s*=.*!SOAP.Enabled = $(WORLDSERVER_SOAP)!g;' \
+			-e 's!^SOAP\.IP\s*=.*!SOAP.IP = "$(WORLDSERVER_SOAP_IP)"!g;' \
 			< "$@.dist" > "$@"
 
 artifacts/bin/%:
