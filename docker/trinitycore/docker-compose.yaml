@@ -34,4 +34,4 @@ services:
       - "3307:3306"
     volumes:
       - ../../artifacts/mysql:/var/lib/mysql
-      - ../../artifacts/sql/import:/docker-entrypoint-initdb.d
+      - ../../artifacts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
