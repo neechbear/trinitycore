@@ -9,7 +9,7 @@ source/*
 .networks
 docker/authserver/authserver
 docker/worldserver/worldserver
-docker/worldserver/data/*
+docker/worldserver/*.sql
 docker/tools/mapextractor
 docker/tools/mmaps_generator
 docker/tools/vmap4assembler

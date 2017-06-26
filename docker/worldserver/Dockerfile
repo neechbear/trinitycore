@@ -18,15 +18,27 @@ RUN apt-get -qq update && \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
 
+# Configurable via INSTALL_PREFIX from the Makefile, and/or using
+# --define CMAKE_INSTALL_PREFIX=/your/path with the docker/build/ container,
+# (which is also published on Ducker Hub as nicolaw/trinitycore).
 ENV install_prefix /opt/trinitycore
 
-WORKDIR "${install_prefix}"
+# https://trinitycore.atlassian.net/wiki/display/tc/Databases+Installation
+# Database import of TDB_*.sql files, astonishingly, requires that the
+# current working directory be the same path as the location of both the
+# worldserver binary and the TDB_*.sql file.
+WORKDIR "${install_prefix}/bin"
 
+# Wait for the database server to come up first.
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh "${install_prefix}/bin/wait-for-it.sh"
+
+# Add worldserver binary and wrapper, and make executable.
 COPY worldserver.sh "${install_prefix}/bin/worldserver.sh"
 COPY worldserver "${install_prefix}/bin/worldserver"
-
 RUN chmod +x "${install_prefix}/bin"/*
 
-ENTRYPOINT ["bin/worldserver.sh"]
+# Add TDB_*.sql database dump for initial world database initialisation.
+ADD TDB_*.sql "${install_prefix}/bin/"
+
+ENTRYPOINT ["./worldserver.sh"]
 

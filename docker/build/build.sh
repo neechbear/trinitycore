@@ -91,18 +91,20 @@ get_tdb_url() {
 
 extract_7z_archives() {
   declare path="$1"
+  pushd "$path"
   (
     shopt -s nullglob
     if declare zips=("${path%/}"/*.7z) && [[ -n "${zips[@]}" ]]; then
-      pushd "$path"
       zip=""
       for zip in "${zips[@]}"; do
         7z x -y "$zip"
       done
-      popd
     fi
     shopt -u nullglob
   )
+  # mv TDB_*/* .
+  # rmdir TDB_*/
+  popd
 }
 
 download_source() {

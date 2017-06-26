@@ -17,11 +17,15 @@ RUN apt-get -qq update && \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
 
+# Configurable via INSTALL_PREFIX from the Makefile, and/or using
+# --define CMAKE_INSTALL_PREFIX=/your/path with the docker/build/ container,
+# (which is also published on Ducker Hub as nicolaw/trinitycore).
 ENV install_prefix /opt/trinitycore
 
 WORKDIR "${install_prefix}"
 VOLUME "${install_prefix}/etc"
 
+# Wait for the database server to come up first.
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh "${install_prefix}/bin/wait-for-it.sh"
 COPY authserver.sh "${install_prefix}/bin/authserver.sh"
 COPY authserver "${install_prefix}/bin/authserver"

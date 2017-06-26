@@ -19,6 +19,11 @@ MAPDATA = $(addprefix artifacts/mapdata/, Buildings Cameras dbc maps mmaps vmaps
 
 GAMEDATA := World_of_Warcraft
 
+TDB_FILES := $(notdir $(wildcard artifacts/sql/TDB_*/*.sql))
+TDB_WORLDSERVER_FILES = $(addprefix docker/worldserver/, $(TDB_FILES))
+
+SQL_IMPORT := artifacts/sql/import/001-permissions.sql
+
 MPQ = $(addprefix $(GAMEDATA)/Data/, $(addsuffix .MPQ, \
 	common expansion patch-3 patch-2 patch common-2 lichking \
 	enUS/lichking-speech-enUS enUS/expansion-speech-enUS enUS/lichking-locale-enUS \
@@ -29,6 +34,7 @@ MPQ = $(addprefix $(GAMEDATA)/Data/, $(addsuffix .MPQ, \
 .DEFAULT_GOAL := help
 
 help:
+	echo "$(TDB_DB_FILES)"
 	@echo ""
 	@echo "Use 'make build' to build the TrinityCore server binaries."
 	@echo "Use 'make mapdata' to generate worldserver map data from the WoW game client."
@@ -40,13 +46,22 @@ help:
 
 build: $(BINARIES)
 
-run: $(CONF) $(MAPDATA) docker/worldserver/worldserver docker/authserver/authserver
-	cd docker/trinitycore && docker-compose up --build && docker-compose rm
+run: $(CONF) $(MAPDATA) $(SQL_IMPORT) $(TDB_WORLDSERVER_FILES) docker/worldserver/worldserver docker/authserver/authserver
+	cd docker/trinitycore && docker-compose up --build
 
 mapdata: $(MAPDATA)
 
 clean:
 	rm -Rf artifacts source
+
+$(TDB_WORLDSERVER_FILES):
+	cp -r artifacts/sql/TDB_*/"$(notdir $@)" docker/worldserver
+
+artifacts/sql/import/001-permissions.sql: artifacts/sql/create/create_mysql.sql
+	mkdir -p "$(dir $@)"
+	sed -e 's!localhost!%!g;' < "$<" > "$@"
+
+artifacts/sql/create/%: build
 
 $(CONF):
 	sed -e 's!127.0.0.1;3306;!$(DBHOST);$(DBPORT);!g;' \
