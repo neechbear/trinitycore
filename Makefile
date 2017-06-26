@@ -1,6 +1,6 @@
 
 INSTALL_PREFIX = /opt/trinitycore
-MAPDATA = $(INSTALL_PREFIX)/mapdata
+MAPDATA_DIR = $(INSTALL_PREFIX)/mapdata
 
 DBHOST = mariadb
 DBPORT = 3306
@@ -14,6 +14,8 @@ CONF = $(addprefix artifacts/etc/, authserver.conf worldserver.conf)
 BRANCH := $(shell cat artifacts/branch 2>/dev/null)
 BRANCH := $(if $(BRANCH),$(BRANCH), 3.3.5)
 SHORTHASH := $(shell cat artifacts/git-rev-short)
+
+MAPDATA = $(addprefix artifacts/mapdata/, Buildings Cameras dbc maps mmaps vmaps)
 
 GAMEDATA := World_of_Warcraft
 
@@ -38,17 +40,17 @@ help:
 
 build: $(BINARIES)
 
-run: $(CONF) artifacts/mapdata docker/worldserver/worldserver docker/authserver/authserver
+run: $(CONF) $(MAPDATA) docker/worldserver/worldserver docker/authserver/authserver
 	cd docker/trinitycore && docker-compose up --build && docker-compose rm
 
-mapdata: artifacts/mapdata
+mapdata: $(MAPDATA)
 
 clean:
 	rm -Rf artifacts source
 
 $(CONF):
 	sed -e 's!127.0.0.1;3306;!$(DBHOST);$(DBPORT);!g;' \
-		  -e 's!^DataDir\s*=.*!DataDir = "$(MAPDATA)"!g;' \
+		  -e 's!^DataDir\s*=.*!DataDir = "$(MAPDATA_DIR)"!g;' \
 			-e 's!^SourceDirectory\s*=.*!SourceDirectory = "$(INSTALL_PREFIX)"!g;' \
 			-e 's!^BuildDirectory\s*=.*!BuildDirectory = "$(INSTALL_PREFIX)/source/TrinityCore/build"!g;' \
 			< "$@.dist" > "$@"
@@ -63,7 +65,7 @@ artifacts/bin/%:
 		--define "CMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)" \
 		--verbose
 
-artifacts/mapdata: $(addprefix docker/tools/, $(TOOLS))
+artifacts/mapdata/%: $(addprefix docker/tools/, $(TOOLS))
 	docker build -t tctools docker/tools
 	docker run -it --rm \
 		-v "${CURDIR}/World_of_Warcraft":/World_of_Warcraft:ro \
