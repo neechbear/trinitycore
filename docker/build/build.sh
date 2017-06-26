@@ -25,8 +25,8 @@ drop_to_shell() {
   if [[ -n "${cmdarg_cfg[reference]:-}" ]]; then
     echo -e "\033[0m  => \033[31mRef. sources are in: \033[1m${cmdarg_cfg[reference]:-}"
   fi
-  echo -e "\033[0m  => \033[31mSources are in:      \033[1m$source"
-  echo -e "\033[0m  => \033[31mBuild root is in:    \033[1m$source/build"
+  echo -e "\033[0m  => \033[31mSources are in:      \033[1m${cmdarg_cfg[source]%/}"
+  echo -e "\033[0m  => \033[31mBuild root is in:    \033[1m${cmdarg_cfg[source]%/}/TrinityCore/build"
   echo -e "\033[0m  => \033[31mArtifacts are in:    \033[1m${cmdarg_cfg[output]}"
   echo -e "\033[0m  => \033[31mBuild script is:     \033[1m$(cat /proc/$$/cmdline | tr '\000' ' ')"
   echo ""
@@ -65,6 +65,7 @@ _parse_command_line_arguments () {
   cmdarg 'b:'   'branch'    'Branch (version) of TrinityCore to build' '3.3.5'
   cmdarg 't?'   'tdb'       'TDB database release archive URL to download'
   cmdarg 'r:'   'repo'      'Git repository to clone from' 'https://github.com/TrinityCore/TrinityCore.git'
+  cmdarg 'S?'   'source'    'Source code download and build root' '/usr/local/src' is_directory
   cmdarg 'R?'   'reference' 'Cached reference Git repository on local machine'
   cmdarg 'D?{}' 'define'    'Supply additional -D arguments to cmake'
   cmdarg 'd'    'debug'     'Produce a debug build'
@@ -96,7 +97,7 @@ extract_7z_archives() {
       pushd "$path"
       zip=""
       for zip in "${zips[@]}"; do
-        7z x "$zip"
+        7z x -y "$zip"
       done
       popd
     fi
@@ -126,20 +127,24 @@ download_source() {
   log_info " -> $repo_url ($branch branch)"
   log_info " -> $tdb_url"
 
-  if [[ ! -e "$target/trinitycore" ]]; then
-    git clone --branch "$branch" --single-branch --depth 1 \
+  declare repo_dir="$target/TrinityCore"
+  # https://github.com/TrinityCore/TrinityCore/blob/master/cmake/genrev.cmake
+  # https://git-scm.com/docs/git-describe
+  if [[ ! -e "$repo_dir" ]]; then
+    git clone \
+      --branch "$branch" --single-branch \
+      --shallow-since="$(date +%F -d "6 months ago")" \
       ${cmdarg_cfg[reference]:+--reference "${cmdarg_cfg[reference]}"} \
-      "$repo_url" "$target/trinitycore"
+      "$repo_url" "$repo_dir"
   else
-    git -C "$target/trinitycore" pull
+    git -C "$repo_dir" pull
   fi
-  git -C "$target/trinitycore" fetch -t
 
-  if [[ ! -s "$target/${tdb_url##*/}" ]]; then
-    mkdir -p "$target/sql"
+  if [[ ! -s "$repo_dir/sql/${tdb_url##*/}" ]]; then
+    mkdir -p "$repo_dir/sql"
     echo "Downloading database $tdb_url ..."
-    curl -L --progress-bar -o "$target/sql/${tdb_url##*/}" "$tdb_url"
-    extract_7z_archives "$target/sql"
+    curl -L --progress-bar -o "$repo_dir/sql/${tdb_url##*/}" "$tdb_url"
+    extract_7z_archives "$repo_dir/sql"
   fi
 }
 
@@ -151,8 +156,8 @@ define_args() {
 }
 
 build() {
-  mkdir -p "$source/trinitycore/build"
-  cd "$source/trinitycore/build"
+  mkdir -p "${cmdarg_cfg[source]%/}/TrinityCore/build"
+  pushd "${cmdarg_cfg[source]%/}/TrinityCore/build"
 
   # Turn on --debug preset cmake arguments.
   if [[ "${cmdarg_cfg[debug]}" == true ]]; then
@@ -188,6 +193,8 @@ build() {
   cmake ../ $(define_args) ${extra_cmake_args[@]:-}
   make -j "${parallel_jobs:-1}"
   make install
+
+  popd
 }
 
 main() {
@@ -213,9 +220,7 @@ main() {
   fi
 
   # Download source in to /usr/local/src/.
-  declare -g source="/usr/local/src/${cmdarg_cfg[branch]//[^a-zA-Z0-9\._-]/}"
-  mkdir -p "$source"
-  download_source "$source" \
+  download_source "${cmdarg_cfg[source]}" \
     "${cmdarg_cfg[branch]}" "${cmdarg_cfg[repo]}" "${cmdarg_cfg[tdb]}"
 
   # Build TrinityCore.
@@ -223,26 +228,19 @@ main() {
 
   # Copy build artifacts to output directory.
   cp -r "${define[CMAKE_INSTALL_PREFIX]%/}"/* "${cmdarg_cfg[output]%/}"/
-  declare conf_dist=""
-  for conf_dist in "${cmdarg_cfg[output]%/}"/etc/*.conf.dist ; do
-    if [[ ! -e "${conf_dist%%.conf.dist}.conf}" ]]; then
-      cp "$conf_dist" "${conf_dist%%.conf.dist}.conf}"
-    fi
-  done
 
   # Copy SQL artifacts to output directory.
   mkdir -p "${cmdarg_cfg[output]%/}/sql"
-  cp -r "$source/sql/"* "${cmdarg_cfg[output]%/}/sql/"
-  cp -r "$source/trinitycore/sql/"* "${cmdarg_cfg[output]%/}/sql/"
+  cp -r "${cmdarg_cfg[source]%/}/TrinityCore/sql/"* "${cmdarg_cfg[output]%/}/sql/"
 
   # Save Git revision.
-  git -C "$source" rev-parse short HEAD > "${cmdarg_cfg[output]%/}/git-rev"
-  git -C "$source" rev-parse --short HEAD > "${cmdarg_cfg[output]%/}/git-rev-short"
+  git -C "${cmdarg_cfg[source]%/}/TrinityCore" rev-parse HEAD > "${cmdarg_cfg[output]%/}/git-rev"
+  git -C "${cmdarg_cfg[source]%/}/TrinityCore" rev-parse --short HEAD > "${cmdarg_cfg[output]%/}/git-rev-short"
 
   # "This should be OK for us."
   # https://nicolaw.uk/this_should_be_OK_for_us
   find "${cmdarg_cfg[output]}" -type d -exec chmod a+x '{}' \;
-  chmod -R a+rw "${foo//[^a-zA-Z0-9\._-]/}"
+  chmod -R a+rw "${cmdarg_cfg[output]%/}/"*
 }
 
 main "$@"

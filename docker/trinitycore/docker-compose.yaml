@@ -22,7 +22,7 @@ services:
       - "7878:7878"
     volumes:
       - ../../artifacts/etc:/opt/trinitycore/etc
-      - ../../artifacts/mapdata:/opt/trinitycore/data
+      - ../../artifacts/mapdata:/opt/trinitycore/mapdata
       - ../../artifacts/sql:/opt/trinitycore/sql
   mariadb:
     image: "mariadb:latest"

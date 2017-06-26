@@ -5,6 +5,7 @@ trinitycore-cache/*
 wowdata/*
 Data/*
 data/*
+source/*
 World of Warcraft/*
 *.7z
 .networks
