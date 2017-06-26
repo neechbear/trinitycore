@@ -72,7 +72,7 @@ clean:
 	rm -Rf artifacts source
 
 springclean:
-	rm -Rf artifacts/mysql/* $(CONF) docker/worldserver/*.sql docker/worldserver/worldserver docker/authserver/authserver $(dir $(SQL_IMPORT))
+	rm -Rf artifacts/mysql/* $(CONF) docker/worldserver/*.sql docker/worldserver/worldserver docker/authserver/authserver $(dir $(SQL_IMPORT)) $(addprefix docker/tools/, $(TOOLS))
 
 $(TDB_WORLDSERVER_FILES):
 	cp -r artifacts/sql/TDB_*/"$(notdir $@)" docker/worldserver
