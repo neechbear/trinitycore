@@ -24,6 +24,7 @@ WORLDSERVER_SOAP_IP = 0.0.0.0
 TOOLS = mapextractor mmaps_generator vmap4assembler vmap4extractor
 BINARIES = $(addprefix artifacts/bin/, $(TOOLS) authserver worldserver)
 CONF = $(addprefix artifacts/etc/, authserver.conf worldserver.conf)
+DIST_CONF = $(addsuffix .dist, $(CONF))
 
 # Version of TrinityCore we are compiling, packaging and running.
 BRANCH := $(shell cat artifacts/branch 2>/dev/null)
@@ -71,6 +72,7 @@ help:
 build: $(BINARIES)
 
 run: $(CONF) $(MAPDATA) $(SQL_FIX_REALMLIST) $(SQL_ADD_GM_USER) $(SQL_IMPORT) $(TDB_WORLDSERVER_FILES) docker/worldserver/worldserver docker/authserver/authserver
+	mkdir -p artifacts/mysql
 	cd docker/trinitycore && docker-compose up --build
 
 mapdata: $(MAPDATA)
@@ -99,7 +101,9 @@ $(SQL_IMPORT): artifacts/sql/create/create_mysql.sql
 
 artifacts/sql/create/%: build
 
-$(CONF):
+$(DIST_CONF): build
+
+$(CONF): $(DIST_CONF)
 	sed -e 's!127.0.0.1;3306;!$(DBHOST);$(DBPORT);!g;' \
 		  -e 's!^DataDir\s*=.*!DataDir = "$(MAPDATA_DIR)"!g;' \
 			-e 's!^SourceDirectory\s*=.*!SourceDirectory = "$(INSTALL_PREFIX)"!g;' \
@@ -111,6 +115,7 @@ $(CONF):
 			< "$@.dist" > "$@"
 
 artifacts/bin/%:
+	mkdir -p artifacts source
 	docker build -t "nicolaw/trinitycore:latest" docker/build
 	docker run -it --rm \
 		-v "${CURDIR}/artifacts":/artifacts \
@@ -121,6 +126,7 @@ artifacts/bin/%:
 		--verbose
 
 artifacts/mapdata/%: $(addprefix docker/tools/, $(TOOLS))
+	mkdir -p artifacts/mapdata
 	docker build -t tctools docker/tools
 	docker run -it --rm \
 		-v "${CURDIR}/World_of_Warcraft":/World_of_Warcraft:ro \
