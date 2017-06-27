@@ -3,6 +3,10 @@
 INSTALL_PREFIX = /opt/trinitycore
 MAPDATA_DIR = $(INSTALL_PREFIX)/mapdata
 
+# Default username and password to create a GM user.
+DEFAULT_GM_USER := trinity
+DEFAULT_GM_PASSWORD := trinity
+
 # Database hostname and port. Defaulted to Docker swarm container mariadb.
 DBHOST = mariadb
 DBPORT = 3306
@@ -39,6 +43,10 @@ TDB_WORLDSERVER_FILES = $(addprefix docker/worldserver/, $(TDB_FILES))
 # See https://hub.docker.com/_/mariadb/: Initializing a fresh instance.
 SQL_IMPORT := artifacts/docker-entrypoint-initdb.d/permissions.sql
 
+# Custom auth SQL, fixup realmlist, add GM user.
+SQL_FIX_REALMLIST := artifacts/sql/custom/auth/fix_realmlist.sql
+SQL_ADD_GM_USER := artifacts/sql/custom/auth/add_gm_user.sql
+
 # Currently unused. MPQ game data files used by the map data generation tools.
 # TODO: Set a proper dependency to require these if we need to build map data.
 MPQ = $(addprefix $(GAMEDATA)/Data/, $(addsuffix .MPQ, \
@@ -62,7 +70,7 @@ help:
 
 build: $(BINARIES)
 
-run: $(CONF) $(MAPDATA) $(SQL_IMPORT) $(TDB_WORLDSERVER_FILES) docker/worldserver/worldserver docker/authserver/authserver
+run: $(CONF) $(MAPDATA) $(SQL_FIX_REALMLIST) $(SQL_ADD_GM_USER) $(SQL_IMPORT) $(TDB_WORLDSERVER_FILES) docker/worldserver/worldserver docker/authserver/authserver
 	cd docker/trinitycore && docker-compose up --build
 
 mapdata: $(MAPDATA)
@@ -71,12 +79,21 @@ clean:
 	rm -Rf artifacts source
 
 springclean:
-	rm -Rf artifacts/mysql/* $(CONF) docker/worldserver/*.sql docker/worldserver/worldserver docker/authserver/authserver $(dir $(SQL_IMPORT)) $(addprefix docker/tools/, $(TOOLS))
+	rm -Rf artifacts/mysql/* $(CONF) docker/worldserver/*.sql docker/worldserver/worldserver docker/authserver/authserver $(SQL_FIX_REALMLIST) $(SQL_ADD_GM_USER) $(dir $(SQL_IMPORT)) $(addprefix docker/tools/, $(TOOLS))
 
 $(TDB_WORLDSERVER_FILES):
 	cp -r artifacts/sql/TDB_*/"$(notdir $@)" docker/worldserver
 
-artifacts/docker-entrypoint-initdb.d/permissions.sql: artifacts/sql/create/create_mysql.sql
+$(SQL_ADD_GM_USER): artifacts/sql/custom
+	@printf 'INSERT INTO account (id, username, sha_pass_hash) VALUES (%s, "%s", SHA1(CONCAT(UPPER("%s"),":",UPPER("%s"))));\n' \
+		"1" "$(DEFAULT_GM_USER)" "$(DEFAULT_GM_USER)" "$(DEFAULT_GM_PASSWORD)" > "$@"
+	@echo "INSERT INTO account_access VALUES (1,3,-1);" >> "$@"
+
+$(SQL_FIX_REALMLIST): artifacts/sql/custom
+	printf 'UPDATE realmlist SET address = "%s" WHERE id = 1 AND address = "127.0.0.1";\n' \
+		"$(shell hostname -i | egrep -o '[0-9\.]{7,15}')" > "$@"
+
+$(SQL_IMPORT): artifacts/sql/create/create_mysql.sql
 	mkdir -p "$(dir $@)"
 	sed -e 's!localhost!%!g;' < "$<" > "$@"
 
