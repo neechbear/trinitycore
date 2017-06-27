@@ -24,7 +24,7 @@ CONF = $(addprefix artifacts/etc/, authserver.conf worldserver.conf)
 # Version of TrinityCore we are compiling, packaging and running.
 BRANCH := $(shell cat artifacts/branch 2>/dev/null)
 BRANCH := $(if $(BRANCH),$(BRANCH), 3.3.5)
-SHORTHASH := $(shell cat artifacts/git-rev-short)
+SHORTHASH := $(shell cat artifacts/git-rev-short 2>/dev/null)
 
 # Location of WoW game client files, used to generate worldserver map data.
 GAMEDATA := World_of_Warcraft
@@ -51,7 +51,6 @@ MPQ = $(addprefix $(GAMEDATA)/Data/, $(addsuffix .MPQ, \
 .DEFAULT_GOAL := help
 
 help:
-	echo "$(TDB_DB_FILES)"
 	@echo ""
 	@echo "Use 'make build' to build the TrinityCore server binaries."
 	@echo "Use 'make mapdata' to generate worldserver map data from the WoW game client."
@@ -100,7 +99,7 @@ artifacts/bin/%:
 		-v "${CURDIR}/artifacts":/artifacts \
 		-v "${CURDIR}/source":/usr/local/src \
 		"nicolaw/trinitycore:latest" \
-		--branch "$(BRANCH)" \
+		--branch $(BRANCH) \
 		--define "CMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)" \
 		--verbose
 

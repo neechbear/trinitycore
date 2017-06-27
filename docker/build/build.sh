@@ -133,9 +133,9 @@ download_source() {
   # https://github.com/TrinityCore/TrinityCore/blob/master/cmake/genrev.cmake
   # https://git-scm.com/docs/git-describe
   if [[ ! -e "$repo_dir" ]]; then
+      #--shallow-since="$(date +%F -d "6 months ago")" \
     git clone \
       --branch "$branch" --single-branch \
-      --shallow-since="$(date +%F -d "6 months ago")" \
       ${cmdarg_cfg[reference]:+--reference "${cmdarg_cfg[reference]}"} \
       "$repo_url" "$repo_dir"
   else

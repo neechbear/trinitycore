@@ -95,7 +95,7 @@ extract_map_data() {
   declare output="$2"
 
   pushd "$output"
-  #mkdir -p "${output%/}"/{dbc,maps,mmaps,vmaps,Buildings,Cameras}
+  mkdir -p "${output%/}"/{mmaps,vmaps}
 
   # dbc, maps
   if [[ "${cmdarg_cfg[maps]}" == true ]]; then
