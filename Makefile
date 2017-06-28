@@ -81,6 +81,7 @@ help:
 	@echo "Use 'make mapdata' to generate worldserver map data from the WoW game client."
 	@echo "Use 'make run' to launch the TrinityCore servers inside a Docker swarm."
 	@echo "Use 'make clean' to destroy ALL build artifacts from the above steps."
+	@echo "Use 'make springclean' to destroy the MariaDB and configuration files."
 	@echo ""
 	@echo "Refer to https://github.com/neechbear/trinitycore/blob/master/GettingStarted.md for additional help."
 	@echo ""
