@@ -46,6 +46,9 @@ From your Linux shell, run the following:
     $ cd trinitycore
     $ make build
 
+Depending on the performance of your machine, this may take up to 1 hour to
+complete.
+
 The TrinityCore server should now be compiled inside of a Docker container. The
 resulting build artifacts will be placed in to the `./artifacts/` sub-directory
 in your current path.
@@ -65,6 +68,9 @@ previous compile steps.
 You can then run the next command to generate the map data.
 
     $ make mapdata
+
+Depending on the performance of your machine, this may take up to 4 hours to
+complete.
 
 
 ### Starting the TrinityCore Server
