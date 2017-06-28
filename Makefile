@@ -34,10 +34,17 @@ SQL_ADD_GM_USER = $(SQL_ARTIFACTS)/custom/auth/add_gm_user.sql
 SQL_TDB = $(notdir $(wildcard $(SQL_ARTIFACTS)/TDB_*/*.sql))
 SQL_TDB_WORLDSERVER = $(addprefix docker/worldserver/, $(SQL_TDB))
 
+# Version of TrinityCore we are compiling, packaging and running.
+BRANCH := $(shell cat $(ARTIFACTS)/branch 2>/dev/null)
+BRANCH := $(if $(BRANCH),$(BRANCH),3.3.5)
+SHORTHASH := $(shell cat $(ARTIFACTS)/git-rev-short 2>/dev/null)
+
 # Directories expected to be generated for worldserver map data.
 MAP_DATA_DIR = mapdata
 MAP_DATA_ARTIFACTS = $(ARTIFACTS)/$(MAP_DATA_DIR)
 MAP_DATA = $(addprefix $(MAP_DATA_ARTIFACTS)/, Buildings Cameras dbc maps mmaps vmaps)
+MAP_DATA_DEB = $(ARTIFACTS)/trinitycore-mapdata_$(BRANCH)-$(SHORTHASH)_all.deb
+MAP_DATA_RPM = $(ARTIFACTS)/trinitycore-mapdata-$(BRANCH)-$(SHORTHASH).noarch.rpm
 
 # MPQ game data files use to generate the worldserver map data.
 MPQ = $(addprefix $(GAME_CLIENT)/Data/, $(addsuffix .MPQ, \
@@ -60,11 +67,6 @@ MYSQL_ARTIFACTS = $(ARTIFACTS)/$(MYSQL_DIR)
 # Installation location of TrinityCore server.
 INSTALL_PREFIX = /opt/trinitycore
 
-# Version of TrinityCore we are compiling, packaging and running.
-BRANCH := $(shell cat $(ARTIFACTS)/branch 2>/dev/null)
-BRANCH := $(if $(BRANCH),$(BRANCH), 3.3.5)
-SHORTHASH := $(shell cat $(ARTIFACTS)/git-rev-short 2>/dev/null)
-
 
 .PHONY: run build springclean clean help mapdata_deb mapdata_rpm mapdata
 .INTERMEDIATE: $(addprefix docker/tools/, $(TOOLS))
@@ -80,6 +82,8 @@ help:
 	@echo "Use 'make build' to build the TrinityCore server binaries."
 	@echo "Use 'make mapdata' to generate worldserver map data from the WoW game client."
 	@echo "Use 'make run' to launch the TrinityCore servers inside a Docker swarm."
+	@echo "Use 'make mapdata_deb' to build a DEB package containing the worldserver map data files."
+	@echo "Use 'make mapdata_rpm' to build an RPM package containing the worldserver map data files."
 	@echo "Use 'make clean' to destroy ALL build artifacts from the above steps."
 	@echo "Use 'make springclean' to destroy the MariaDB and configuration files."
 	@echo ""
@@ -124,7 +128,7 @@ $(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create/%:
 		-v "${CURDIR}/$(ARTIFACTS)":/$(ARTIFACTS) \
 		-v "${CURDIR}/$(SOURCE_DIR)":/usr/local/src \
 		"nicolaw/trinitycore:latest" \
-		--branch $(BRANCH) \
+		--branch "$(BRANCH)" \
 		--define "CMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)" \
 		--verbose
 
@@ -194,25 +198,24 @@ docker/%:
 #
 
 mapdata_deb: PKGTYPE=deb
-mapdata_deb: $(ARTIFACTS)/trinitycore-mapdata_$(BRANCH)-$(SHORTHASH)_all.deb
+mapdata_deb: $(MAP_DATA_DEB)
 
 mapdata_rpm: PKGTYPE=rpm
-mapdata_rpm: $(ARTIFACTS)/trinitycore-mapdata-$(BRANCH)-$(SHORTHASH).noarch.rpm
+mapdata_rpm: $(MAP_DATA_RPM)
 
-# FIXME: Missing target can't be found properly - needs fixing.
-%.deb %.rpm: $(ARTIFACTS)/mapdata
-  cd $(ARTIFACTS) && fpm \
-    --input-type dir \
-    --output-type "$(PKGTYPE)" \
-    --name trinitycore-mapdata --version "$(BRANCH)" \
-    --iteration "$(SHORTHASH)" \
-    --verbose \
-    --url "https://www.trinitycore.org" \
-    --maintainer "TrinityCore" \
-    --category "Amusements/Games" \
-    --vendor "TrinityCore" \
-    --description "TrinityCore world server map data" \
-    --architecture "all" \
-    --directories "$(INSTALL_PREFIX)/mapdata" \
-    mapdata=$(INSTALL_PREFIX)
+$(MAP_DATA_RPM) $(MAP_DATA_DEB): $(MAP_DATA)
+	cd $(ARTIFACTS) && fpm \
+		--input-type dir \
+		--output-type "$(PKGTYPE)" \
+		--name trinitycore-mapdata --version "$(BRANCH)" \
+		--iteration "$(SHORTHASH)" \
+		--verbose \
+		--url "https://www.trinitycore.org" \
+		--maintainer "TrinityCore" \
+		--category "Amusements/Games" \
+		--vendor "TrinityCore" \
+		--description "TrinityCore world server map data" \
+		--architecture "all" \
+		--directories "$(INSTALL_PREFIX)/mapdata" \
+		mapdata=$(INSTALL_PREFIX)
 
