@@ -19,7 +19,8 @@ Command line help is available through --help option.
     $ docker run -it --rm -v "$PWD/artifacts":/artifacts nicolaw/trinitycore
 
 YouTube video demonstration for beginners can be viewed at
-https://www.youtube.com/watch?v=vA3yO27iDZI.
+https://www.youtube.com/watch?v=vA3yO27iDZI and
+https://www.youtube.com/watch?v=JmzZdexSYaM.
 
 ## Synopsis
 
