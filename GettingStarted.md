@@ -16,10 +16,28 @@ You will need a Linux or OS X machine that has the following things installed:
   * `make`
   * `git`
   * Docker
-  * `docker-compose` - See https://docs.docker.com/compose/install/
+  * `docker-compose` - Follow instructions at https://docs.docker.com/compose/install/
 
 You will also need a *legitimate* copy of World of Warcraft: Wrath of the Lich
 King (game client version 3.3.5a).
+
+
+### Debian & Ubuntu
+
+These required packages can be installed on Debian & Ubuntu by running the
+following from your Linux shell:
+
+    $ sudo apt-get install make git
+    $ curl -sSL https://get.docker.com/ | sh
+
+
+### Debian & Ubuntu
+
+These required packages can be installed on CentOS & RHEL by running the
+following from your Linux shell:
+
+    $ sudo yum install make git
+    $ curl -sSL https://get.docker.com/ | sh
 
 
 ## Installation
