@@ -65,7 +65,7 @@ on OS X), in to a directory called `World_of_Warcraft` (using underscores
 instead of spaces), under the `trinitycore` directory that you created in the
 previous compile steps.
 
-You can then run the next command to generate the map data.
+You can now run the next command to generate the map data.
 
     $ make mapdata
 
@@ -97,7 +97,7 @@ file in your favorite text editor (or Notepad), and change the logon server to
 be the IP address or hostname of the Linux machine that will be running your
 TrinityCore server.
 
-You can then launch your World of Warcraft game client, and login with the
+You can now launch your World of Warcraft game client, and login with the
 default username `trinity` and password `trinity`.
 
 The default `trinity` account has full Game-Master (GM) permissions. See
