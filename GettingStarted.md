@@ -10,10 +10,10 @@ The default username and password is: `trinity`.
 
 You will need a Linux machine that has the following things installed:
 
-  * make
-  * git
+  * `make`
+  * `git`
   * Docker
-  * docker-compose
+  * `docker-compose` - See https://docs.docker.com/compose/install/
 
 
 ## Installation
