@@ -31,7 +31,7 @@ following from your Linux shell:
     $ curl -sSL https://get.docker.com/ | sh
 
 
-### Debian & Ubuntu
+### CentOS & RedHat Enterprise Linux
 
 These required packages can be installed on CentOS & RHEL by running the
 following from your Linux shell:
