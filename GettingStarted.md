@@ -83,6 +83,8 @@ on OS X), in to a directory called `World_of_Warcraft` (using underscores
 instead of spaces), under the `trinitycore` directory that you created in the
 previous compile steps.
 
+![Copying C:\Program Files (x86)\World of Warcraft\ to ~/trinitycore/World_of_Warcraft](.GettingStarted1.gif)
+
 You can now run the next command to generate the map data.
 
     $ make mapdata
