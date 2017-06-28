@@ -18,7 +18,7 @@ You will need a Linux or OS X machine that has the following things installed:
   * Docker
   * `docker-compose` - See https://docs.docker.com/compose/install/
 
-You will also need a legitimate copy of World of Warcraft: Wrath of the Lich
+You will also need a //legitimate// copy of World of Warcraft: Wrath of the Lich
 King (game client version 3.3.5a).
 
 
