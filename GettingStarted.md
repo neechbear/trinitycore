@@ -93,8 +93,8 @@ You can now stop and start your TrinityCore server whenever you wish.
 
 As with any private WoW server, you will need to edit your `realmlist.wtf` file
 in your `World of Warcraft\Data\enUS\` game client directory. Simply open the
-file in your favorite text editor (or Notepad), and change logon server to be
-the IP address or hostname of the Linux machine that will be running your
+file in your favorite text editor (or Notepad), and change the logon server to
+be the IP address or hostname of the Linux machine that will be running your
 TrinityCore server.
 
 You can then launch your World of Warcraft game client, and login with the
