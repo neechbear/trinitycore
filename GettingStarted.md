@@ -86,6 +86,8 @@ To start the server, simply run the following:
 
 To stop the server, press `Control-C`.
 
+You can now stop and start your TrinityCore server whenever you wish.
+
 
 ### Configuring your Game Client
 
