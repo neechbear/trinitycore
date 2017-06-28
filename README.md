@@ -2,6 +2,7 @@
 
 TrinityCore build environment and wrapper.
 
+
 ## Overview 
 
 Pull using `docker pull nicolaw/trinitycore`.
@@ -21,6 +22,10 @@ Command line help is available through --help option.
 YouTube video demonstration for beginners can be viewed at
 https://www.youtube.com/watch?v=vA3yO27iDZI and
 https://www.youtube.com/watch?v=JmzZdexSYaM.
+
+A user-friendly guide can also be found at
+https://github.com/neechbear/trinitycore/blob/master/GettingStarted.md.
+
 
 ## Synopsis
 
@@ -49,6 +54,7 @@ https://www.youtube.com/watch?v=JmzZdexSYaM.
     https://github.com/neechbear/tcadmin, https://nicolaw.uk/#WoW and
     https://hub.docker.com/r/nicolaw/trinitycore.
 
+
 ## Caching & Debugging
 
 If you are experiencing build failures or wish to preform repeated build
@@ -73,6 +79,7 @@ Here you are pre-downloading both the TrinityCore database archive files, and
 Git repository. The `--shell` option will drop you to a Bash shell prompt if the
 build fails if you interrupt the build script by pressing Control-C.
 
+
 ## Running TrinityCore After Compilation
 
 Once you have built TrinityCore, and have a build artifact directory with lots
@@ -85,9 +92,10 @@ https://github.com/neechbear/trinitycore/blob/master/docker/docker-compose.yaml.
 Full instructions on what to do next can be found in the README.md at 
 https://github.com/neechbear/trinitycore/blob/master/docker/README.md.
 
+
 ## See Also
 
-Authors related works:
+Related works by the same author:
 
 * https://github.com/neechbear/trinitycore
 * https://hub.docker.com/r/nicolaw/trinitycore
@@ -95,7 +103,7 @@ Authors related works:
 * https://neech.me.uk
 * https://nicolaw.uk/#WoW
 
-Related TrinityCore projects:
+Related TrinityCore projects and links:
 
 * https://trinitycore.atlassian.net/wiki/display/tc/Installation+Guide
   * https://github.com/TrinityCore/
@@ -106,6 +114,7 @@ Related TrinityCore projects:
 
 Initial inspiration taken from Jose Falcon's project
 https://github.com/neechbear/josefalcon-trinitycore-docker.
+
 
 ## License
 
@@ -130,3 +139,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+

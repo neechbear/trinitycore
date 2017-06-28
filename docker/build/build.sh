@@ -58,8 +58,10 @@ _parse_command_line_arguments () {
   cmdarg_info "footer" \
     "See https://github.com/neechbear/trinitycore, https://neech.me.uk," \
     "https://github.com/neechbear/tcadmin, https://nicolaw.uk/#WoW," \
-    "https://hub.docker.com/r/nicolaw/trinitycore and" \
-    "https://www.youtube.com/channel/UCXDKo2buioQu_cqwIrxODpQ."
+    "https://hub.docker.com/r/nicolaw/trinitycore," \
+    "https://www.youtube.com/channel/UCXDKo2buioQu_cqwIrxODpQ," \
+    "https://www.youtube.com/watch?v=JmzZdexSYaM and" \
+    "https://github.com/neechbear/trinitycore/blob/master/GettingStarted.md."
 
   cmdarg 'o:'   'output'    'Output directory for finished build artifacts' '/artifacts' is_directory
   cmdarg 'b:'   'branch'    'Branch (version) of TrinityCore to build' '3.3.5'

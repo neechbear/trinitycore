@@ -70,8 +70,11 @@ _parse_command_line_arguments () {
     "" \
     "See https://github.com/neechbear/trinitycore, https://neech.me.uk," \
     "https://github.com/neechbear/tcadmin, https://nicolaw.uk/#WoW," \
-    "https://hub.docker.com/r/nicolaw/trinitycore and." \
-    "https://www.youtube.com/channel/UCXDKo2buioQu_cqwIrxODpQ."
+    "https://hub.docker.com/r/nicolaw/trinitycore," \
+    "https://www.youtube.com/channel/UCXDKo2buioQu_cqwIrxODpQ," \
+    "https://www.youtube.com/watch?v=JmzZdexSYaM and" \
+    "https://github.com/neechbear/trinitycore/blob/master/GettingStarted.md."
+
 
   cmdarg 'o:' 'output'  'Output directory for finished map data artifacts' '/artifacts' is_directory
   cmdarg 'i:' 'input'   'Input directory containing WoW game client (and Data sub-directory)' '/World_of_Warcraft' is_directory
