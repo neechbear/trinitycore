@@ -66,7 +66,7 @@ help:
 	@echo "Use 'make run' to launch the TrinityCore servers inside a Docker swarm."
 	@echo "Use 'make clean' to destroy all build artifacts from the above steps."
 	@echo ""
-	@echo "Refer to https://github.com/neechbear/trinitycore for additional help."
+	@echo "Refer to https://github.com/neechbear/trinitycore/blob/master/GettingStarted.md for additional help."
 	@echo ""
 
 build: $(BINARIES)
