@@ -3,7 +3,10 @@
 First watch this video demonstration
 https://www.youtube.com/watch?v=JmzZdexSYaM.
 
-The default username and password is: `trinity`.
+This guide will walk you through setting up a TrinityCore private WoW server for
+Wrath of the Lich King (game client version 3.3.5a).
+
+The default username and password will be: `trinity`.
 
 
 ## Requirements
@@ -15,10 +18,13 @@ You will need a Linux or OS X machine that has the following things installed:
   * Docker
   * `docker-compose` - See https://docs.docker.com/compose/install/
 
+You will also need a legitimate copy of World of Warcraft: Wrath of the Lich
+King (game client version 3.3.5a).
+
 
 ## Installation
 
-You will need to preform 3 distinct steps in order to start your private
+You will need to preform 4 distinct steps in order to start your private
 TrinityCore server, (and start playing on it).
 
   1. Compile the TrinityCore server.
@@ -26,8 +32,10 @@ TrinityCore server, (and start playing on it).
   2. Generate the map data used by the `worldserver`. This will require a copy
      of the World of Warcraft game client files.
 
-  3. Start the TrinityCore server, and connect to it using your World of
-     Warcraft game client.
+  3. Start the TrinityCore server.
+
+  4. Configure your World of Warcraft game client, then connect to your
+     TrinityCore private WoW server.
 
 
 ### Compiling TrinityCore
@@ -71,6 +79,9 @@ To start the server, simply run the following:
     $ make run
 
 To stop the server, press `Control-C`.
+
+
+### Configuring your Game Client
 
 As with any private WoW server, you will need to edit your `realmlist.wtf` file
 in your `World of Warcraft\Data\enUS\` game client directory. Simply open the
