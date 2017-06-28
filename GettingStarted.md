@@ -112,12 +112,10 @@ Related works by the same author:
 Related TrinityCore projects and links:
 
   * https://trinitycore.atlassian.net/wiki/display/tc/GM+Commands
-
   * https://trinitycore.atlassian.net/wiki/display/tc/Installation+Guide
     * https://github.com/TrinityCore/
       * https://github.com/TrinityCore/TrinityCore
       * https://github.com/TrinityCore/aowow
-
   * https://github.com/Sarjuuk/aowow
     * https://db.rising-gods.de
 
