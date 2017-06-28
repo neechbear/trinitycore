@@ -125,6 +125,20 @@ available commands.
 Enjoy!
 
 
+## Further Customisation
+
+TODO: Describe the following here (while linking to as many pre-existing
+TrinityCore forum and documentation resources as possible at the same time):
+
+  * Inserting custom SQL before first `make run`.
+  * Use of `worldserver` remote console.
+  * Use of `worldserver` SOAP API.
+  * Using `tcadmin`.
+  * Launching the Docker swarm into the background as a daemon.
+  * Changing `authserver.conf` and `worldserver.conf`.
+  * Connecting to the MariaDB database.
+
+
 ## See Also
 
 Related works by the same author:
