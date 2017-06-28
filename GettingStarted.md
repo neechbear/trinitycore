@@ -8,7 +8,7 @@ The default username and password is: `trinity`.
 
 ## Requirements
 
-You will need a Linux machine that has the following things installed:
+You will need a Linux or OS X machine that has the following things installed:
 
   * `make`
   * `git`
