@@ -4,8 +4,8 @@ DEFAULT_GM_USER = trinity
 DEFAULT_GM_PASSWORD = trinity
 
 # Database hostname and port. Defaulted to Docker swarm container mariadb.
-DBHOST = mariadb
-DBPORT = 3306
+DB_HOST = mariadb
+DB_PORT = 3306
 
 # Enable worldserver remote access and SOAP API by default.
 WORLDSERVER_RA = 1
@@ -17,7 +17,7 @@ WORLDSERVER_SOAP_IP = 0.0.0.0
 GAME_CLIENT = World_of_Warcraft
 
 # Package type to build for map data. (Optional step).
-PKGTYPE = deb
+PKG_TYPE = deb
 
 # Build artifacts output path.
 ARTIFACTS = artifacts
@@ -35,16 +35,17 @@ SQL_TDB = $(notdir $(wildcard $(SQL_ARTIFACTS)/TDB_*/*.sql))
 SQL_TDB_WORLDSERVER = $(addprefix docker/worldserver/, $(SQL_TDB))
 
 # Version of TrinityCore we are compiling, packaging and running.
+# (We currently only work with 3.3.5 branch, so this is a partially moot).
 BRANCH := $(shell cat $(ARTIFACTS)/branch 2>/dev/null)
 BRANCH := $(if $(BRANCH),$(BRANCH),3.3.5)
-SHORTHASH := $(shell cat $(ARTIFACTS)/git-rev-short 2>/dev/null)
+SHORT_HASH := $(shell cat $(ARTIFACTS)/git-rev-short 2>/dev/null)
 
 # Directories expected to be generated for worldserver map data.
 MAP_DATA_DIR = mapdata
 MAP_DATA_ARTIFACTS = $(ARTIFACTS)/$(MAP_DATA_DIR)
 MAP_DATA = $(addprefix $(MAP_DATA_ARTIFACTS)/, Buildings Cameras dbc maps mmaps vmaps)
-MAP_DATA_DEB = $(ARTIFACTS)/trinitycore-mapdata_$(BRANCH)-$(SHORTHASH)_all.deb
-MAP_DATA_RPM = $(ARTIFACTS)/trinitycore-mapdata-$(BRANCH)-$(SHORTHASH).noarch.rpm
+MAP_DATA_DEB = $(ARTIFACTS)/trinitycore-mapdata_$(BRANCH)-$(SHORT_HASH)_all.deb
+MAP_DATA_RPM = $(ARTIFACTS)/trinitycore-mapdata-$(BRANCH)-$(SHORT_HASH).noarch.rpm
 
 # MPQ game data files use to generate the worldserver map data.
 MPQ = $(addprefix $(GAME_CLIENT)/Data/, $(addsuffix .MPQ, \
@@ -78,7 +79,7 @@ INSTALL_PREFIX = /opt/trinitycore
 #
 
 help:
-	@echo "$(MAP_DATA)"
+	@echo ""
 	@echo "Use 'make build' to build the TrinityCore server binaries."
 	@echo "Use 'make mapdata' to generate worldserver map data from the WoW game client."
 	@echo "Use 'make run' to launch the TrinityCore servers inside a Docker swarm."
@@ -106,14 +107,27 @@ run: $(BINARIES) $(CONF) $(MAP_DATA) \
 
 # Clean ALL artifacts, source and MariaDB / mysql database files.
 clean:
+	@while [ -z "$$CONFIRM_CLEAN" ]; do \
+			read -r -p "Are you sure you want to delete ALL build artifacts and map data? [y/N]: " CONFIRM_CLEAN; \
+		done; [ "$$CONFIRM_CLEAN" = "y" ]
 	rm -Rf $(ARTIFACTS) $(SOURCE_DIR)
 
 # Clean most things, except $(ARTIFACTS) which takes a long time to build.
 springclean:
+	@while [ -z "$$CONFIRM_CLEAN" ]; do \
+			read -r -p "Are you sure you want to delete databases and configuration? [y/N]: " CONFIRM_CLEAN; \
+		done; [ "$$CONFIRM_CLEAN" = "y" ]
 	rm -Rf $(MYSQL_ARTIFACTS) $(CONF) docker/worldserver/*.sql \
 		docker/worldserver/worldserver docker/authserver/authserver \
 		$(SQL_FIX_REALMLIST) $(SQL_ADD_GM_USER) $(dir $(SQL_IMPORT)) \
 		$(addprefix docker/tools/, $(TOOLS))
+
+# DEB and RPM packaging up of mapdata files for later easier re-installation.
+mapdata_deb: PKG_TYPE=deb
+mapdata_deb: $(MAP_DATA_DEB)
+
+mapdata_rpm: PKG_TYPE=rpm
+mapdata_rpm: $(MAP_DATA_RPM)
 
 
 #
@@ -127,7 +141,7 @@ $(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create/%:
 	docker run -it --rm \
 		-v "${CURDIR}/$(ARTIFACTS)":/$(ARTIFACTS) \
 		-v "${CURDIR}/$(SOURCE_DIR)":/usr/local/src \
-		"nicolaw/trinitycore:latest" \
+		"tcbuild" \
 		--branch "$(BRANCH)" \
 		--define "CMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)" \
 		--verbose
@@ -135,11 +149,11 @@ $(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create/%:
 # Generate worldserver map data from World of Warcraft game client data inside a
 # Docker container.
 $(MAP_DATA): $(addprefix docker/tools/, $(TOOLS)) $(MPQ)
-	mkdir -p $(ARTIFACTS)/mapdata
+	mkdir -p $(MAP_DATA_ARTIFACTS)
 	docker build -t tctools docker/tools
 	docker run -it --rm \
 		-v "${CURDIR}/World_of_Warcraft":/World_of_Warcraft:ro \
-		-v "${CURDIR}/$(ARTIFACTS)/mapdata":/$(ARTIFACTS) \
+		-v "${CURDIR}/$(MAP_DATA_ARTIFACTS)":/$(ARTIFACTS) \
 		"tctools" \
 		--verbose
 
@@ -152,7 +166,7 @@ $(MAP_DATA): $(addprefix docker/tools/, $(TOOLS)) $(MPQ)
 # Create authserver and worldserver configuration files from their default
 # .conf.dist artifacts.
 $(CONF): $(DIST_CONF)
-	sed -e 's!127.0.0.1;3306;!$(DBHOST);$(DBPORT);!g;' \
+	sed -e 's!127.0.0.1;3306;!$(DB_HOST);$(DB_PORT);!g;' \
 		  -e 's!^DataDir\s*=.*!DataDir = "$(INSTALL_PREFIX)/$(MAP_DATA_DIR)"!g;' \
 			-e 's!^SourceDirectory\s*=.*!SourceDirectory = "$(INSTALL_PREFIX)"!g;' \
 			-e 's!^BuildDirectory\s*=.*!BuildDirectory = "$(INSTALL_PREFIX)/$(SOURCE_DIR)/TrinityCore/build"!g;' \
@@ -192,23 +206,13 @@ $(SQL_FIX_REALMLIST): $(SQL_ARTIFACTS)/custom
 docker/%:
 	cp "$(ARTIFACTS)/bin/$(notdir $@)" "$@"
 
-
-#
 # DEB and RPM packaging up of mapdata files for later easier re-installation.
-#
-
-mapdata_deb: PKGTYPE=deb
-mapdata_deb: $(MAP_DATA_DEB)
-
-mapdata_rpm: PKGTYPE=rpm
-mapdata_rpm: $(MAP_DATA_RPM)
-
 $(MAP_DATA_RPM) $(MAP_DATA_DEB): $(MAP_DATA)
 	cd $(ARTIFACTS) && fpm \
 		--input-type dir \
-		--output-type "$(PKGTYPE)" \
+		--output-type "$(PKG_TYPE)" \
 		--name trinitycore-mapdata --version "$(BRANCH)" \
-		--iteration "$(SHORTHASH)" \
+		--iteration "$(SHORT_HASH)" \
 		--verbose \
 		--url "https://www.trinitycore.org" \
 		--maintainer "TrinityCore" \
@@ -216,6 +220,6 @@ $(MAP_DATA_RPM) $(MAP_DATA_DEB): $(MAP_DATA)
 		--vendor "TrinityCore" \
 		--description "TrinityCore world server map data" \
 		--architecture "all" \
-		--directories "$(INSTALL_PREFIX)/mapdata" \
-		mapdata=$(INSTALL_PREFIX)
+		--directories "$(INSTALL_PREFIX)/$(MAP_DATA_DIR)" \
+		$(MAP_DATA_DIR)=$(INSTALL_PREFIX)
 

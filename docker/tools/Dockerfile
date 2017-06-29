@@ -4,16 +4,18 @@
 FROM debian:jessie
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
-RUN apt-get -qq update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y -qq -o Dpkg::Use-Pty=0 install \
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
+    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     software-properties-common python-software-properties \
  < /dev/null > /dev/null
 
 RUN add-apt-repository ppa:nicolaw/blip && \
     sed -i 's/jessie/trusty/g' /etc/apt/sources.list.d/nicolaw-blip-jessie.list
 
-RUN apt-get -qq update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y -qq -o Dpkg::Use-Pty=0 install \
+RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
+    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     blip \
     libboost-filesystem1.55 \
     libboost-iostreams1.55 \
@@ -40,6 +42,8 @@ COPY vmap4extractor "${install_prefix}/bin/vmap4extractor"
 RUN chmod +x "${install_prefix}/bin"/* /tools.sh
 
 VOLUME /artifacts
+
+ENV DEBIAN_FRONTEND newt
 
 ENTRYPOINT ["/tools.sh"]
 CMD ["-o", "/artifacts", "-i", "/World_of_Warcraft"]

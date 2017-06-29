@@ -4,8 +4,10 @@
 FROM debian:jessie
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
-RUN apt-get -qq update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y -qq -o Dpkg::Use-Pty=0 install \
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
+    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     software-properties-common python-software-properties \
  < /dev/null > /dev/null
 
@@ -14,8 +16,8 @@ RUN add-apt-repository ppa:nicolaw/blip && \
 
 # https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
 # https://trinitycore.atlassian.net/wiki/display/tc/Requirements
-RUN apt-get -qq update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y -qq -o Dpkg::Use-Pty=0 install \
+RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
+    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     blip \
     cmake \
     g++ \
@@ -46,6 +48,8 @@ COPY build.sh /
 RUN chmod +x /build.sh
 
 VOLUME /artifacts
+
+ENV DEBIAN_FRONTEND newt
 
 ENTRYPOINT ["/build.sh"]
 CMD ["-o", "/artifacts"]

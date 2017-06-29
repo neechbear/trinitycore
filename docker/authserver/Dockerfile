@@ -4,8 +4,10 @@
 FROM debian:jessie
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
-RUN apt-get -qq update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y -qq -o Dpkg::Use-Pty=0 install \
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
+    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     libboost-filesystem1.55 \
     libboost-iostreams1.55 \
     libboost-program-options1.55 \
@@ -31,6 +33,8 @@ COPY authserver.sh "${install_prefix}/bin/authserver.sh"
 COPY authserver "${install_prefix}/bin/authserver"
 
 RUN chmod +x "${install_prefix}/bin"/*
+
+ENV DEBIAN_FRONTEND newt
 
 ENTRYPOINT ["bin/authserver.sh"]
 
