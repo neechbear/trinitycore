@@ -162,6 +162,29 @@ Related TrinityCore projects and links:
     * https://db.rising-gods.de
 
 
+## Todo
+
+Some planned future improvements to this project are as follows:
+
+  1. Implement additional containers for database and SmartAI editing and
+     browsing.
+
+    * https://github.com/ShinDarth/TC-JSON-API
+      * https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
+    * https://github.com/Helias/Keira2
+    * https://github.com/Sarjuuk/aowow
+    * https://github.com/neechbear/tcadmin
+
+  2. Harmonise `docker/trinitycore/docker-compose.yaml` to read and honor
+     `Makefile` settings and variables.
+
+  3. Attempt to make Docker base container images work with Alpine, Ubuntu and
+     CentOS as well as Debian Jessie.
+
+  4. See what improvements can be incorporated from other similar projects like
+     https://github.com/azerothcore/docker-files/.
+
+
 ## License
 
 MIT License
