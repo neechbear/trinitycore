@@ -1,2 +1,2 @@
 RewriteEngine on
-RewriteRule ^/?(index\.html?)?$ /Keirs2/ [L,L=301]
+RewriteRule ^/?$ /Keira2/ [L,L=301]

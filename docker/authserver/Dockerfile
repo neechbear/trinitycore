@@ -24,7 +24,7 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
 # (which is also published on Ducker Hub as nicolaw/trinitycore).
 ENV install_prefix /opt/trinitycore
 
-WORKDIR "${install_prefix}"
+WORKDIR "${install_prefix}/bin"
 VOLUME "${install_prefix}/etc"
 
 # Wait for the database server to come up first.
@@ -36,5 +36,5 @@ RUN chmod +x "${install_prefix}/bin"/*
 
 ENV DEBIAN_FRONTEND newt
 
-ENTRYPOINT ["bin/authserver.sh"]
+ENTRYPOINT ["./authserver.sh"]
 

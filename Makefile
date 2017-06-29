@@ -1,3 +1,5 @@
+# MIT License
+# # Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
 
 # Default username and password to create a GM user.
 DEFAULT_GM_USER = trinity
@@ -22,9 +24,12 @@ PKG_TYPE = deb
 # Build artifacts output path.
 ARTIFACTS = artifacts
 SQL_ARTIFACTS = $(ARTIFACTS)/sql
+SQL_INITDB_ARTIFACTS = $(ARTIFACTS)/docker-entrypoint-initdb.d
 
 # See https://hub.docker.com/_/mariadb/: Initializing a fresh instance.
-SQL_IMPORT = $(ARTIFACTS)/docker-entrypoint-initdb.d/permissions.sql
+SQL_IMPORT = $(addprefix $(SQL_INITDB_ARTIFACTS)/, 001-permissions.sql \
+	002-tc-json-api-dbc.sql 003-tc-json-api-dbc-achievements.sql \
+	004-aowow.sql 005-aowow-db-structures.sql)
 
 # Custom auth SQL, fixup realmlist, add GM user.
 SQL_FIX_REALMLIST = $(SQL_ARTIFACTS)/custom/auth/fix_realmlist.sql
@@ -46,6 +51,10 @@ MAP_DATA_ARTIFACTS = $(ARTIFACTS)/$(MAP_DATA_DIR)
 MAP_DATA = $(addprefix $(MAP_DATA_ARTIFACTS)/, Buildings Cameras dbc maps mmaps vmaps)
 MAP_DATA_DEB = $(ARTIFACTS)/trinitycore-mapdata_$(BRANCH)-$(SHORT_HASH)_all.deb
 MAP_DATA_RPM = $(ARTIFACTS)/trinitycore-mapdata-$(BRANCH)-$(SHORT_HASH).noarch.rpm
+
+# Directories expected to be generated for aowow MPQ data.
+MPQ_DATA_DIR = mpqdata
+MPQ_DATA_ARTIFACTS = $(ARTIFACTS)/$(MPQ_DATA_DIR)
 
 # MPQ game data files use to generate the worldserver map data.
 MPQ = $(addprefix $(GAME_CLIENT)/Data/, $(addsuffix .MPQ, \
@@ -70,7 +79,7 @@ INSTALL_PREFIX = /opt/trinitycore
 
 
 .PHONY: run build springclean clean help mapdata_deb mapdata_rpm mapdata
-.INTERMEDIATE: $(addprefix docker/tools/, $(TOOLS))
+.INTERMEDIATE: $(addprefix docker/tools/, $(TOOLS)) $(MPQ)
 .DEFAULT_GOAL := help
 
 
@@ -119,7 +128,7 @@ springclean:
 		done; [ "$$CONFIRM_CLEAN" = "y" ]
 	rm -Rf $(MYSQL_ARTIFACTS) $(CONF) docker/worldserver/*.sql \
 		docker/worldserver/worldserver docker/authserver/authserver \
-		$(SQL_FIX_REALMLIST) $(SQL_ADD_GM_USER) $(dir $(SQL_IMPORT)) \
+		$(SQL_FIX_REALMLIST) $(SQL_ADD_GM_USER) $(SQL_INITDB_ARTIFACTS) \
 		$(addprefix docker/tools/, $(TOOLS))
 
 # DEB and RPM packaging up of mapdata files for later easier re-installation.
@@ -163,6 +172,10 @@ $(MAP_DATA): $(addprefix docker/tools/, $(TOOLS)) $(MPQ)
 	$(error Missing $@ necessary to generate worldserver map data; please copy \
 		your World of Warcraft game client in to the $(GAME_CLIENT) directory)
 
+# Create aowow MPQ data artifact directory.
+$(MPQ_DATA_ARTIFACTS):
+	mkdir -p "$@"
+
 # Create authserver and worldserver configuration files from their default
 # .conf.dist artifacts.
 $(CONF): $(DIST_CONF)
@@ -182,12 +195,34 @@ $(CONF): $(DIST_CONF)
 $(SQL_TDB_WORLDSERVER):
 	cp -r $(SQL_ARTIFACTS)/TDB_*/"$(notdir $@)" docker/worldserver
 
+$(SQL_INITDB_ARTIFACTS):
+	mkdir -p "$@"
+
 # Modify create_mysql.sql to grant permissions to % instead of just localhost.
 # (This is nececcary when running the database server in a different Docker
 # container to the authserver and worldserver).
-$(SQL_IMPORT): $(SQL_ARTIFACTS)/create/create_mysql.sql
-	mkdir -p "$(dir $@)"
-	sed -e 's!localhost!%!g;' < "$<" > "$@"
+$(SQL_INITDB_ARTIFACTS)/001-permissions.sql: $(SQL_INITDB_ARTIFACTS) $(SQL_ARTIFACTS)/create/create_mysql.sql
+	sed -e 's!localhost!%!g;' < "$(SQL_ARTIFACTS)/create/create_mysql.sql" > "$@"
+
+# https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
+$(SQL_INITDB_ARTIFACTS)/002-tc-json-api-dbc.sql: $(SQL_INITDB_ARTIFACTS)
+	echo "CREATE DATABASE dbc DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;" >> "$@"
+	echo "GRANT ALL PRIVILEGES ON dbc . * TO 'trinity'@'%' WITH GRANT OPTION;" >> "$@"
+
+# https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
+$(SQL_INITDB_ARTIFACTS)/003-tc-json-api-dbc-achievements.sql: $(SQL_INITDB_ARTIFACTS)
+	echo "USE dbc;" > "$@"
+	curl -sSL https://raw.githubusercontent.com/ShinDarth/TC-JSON-API/master/storage/database/achievements.sql >> "$@"
+
+# https://github.com/Sarjuuk/aowow/blob/master/README.md
+$(SQL_INITDB_ARTIFACTS)/004-aowow.sql: $(SQL_INITDB_ARTIFACTS)
+	echo "CREATE DATABASE aowow DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;" >> "$@"
+	echo "GRANT ALL PRIVILEGES ON aowow . * TO 'trinity'@'%' WITH GRANT OPTION;" >> "$@"
+
+# https://github.com/Sarjuuk/aowow/blob/master/README.md
+$(SQL_INITDB_ARTIFACTS)/005-aowow-db-structures.sql: $(SQL_INITDB_ARTIFACTS)
+	echo "USE aowow;" > "$@"
+	curl -sSL https://raw.githubusercontent.com/Sarjuuk/aowow/master/setup/db_structure.sql >> "$@"
 
 # Create custom SQL file for to be imported on first run that inserts a default
 # account username and password will full GM permissions.

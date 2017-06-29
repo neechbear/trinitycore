@@ -1,11 +1,21 @@
+---
+# MIT License
+# Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
+
+# https://docs.docker.com/compose/compose-file
+
 version: "3"
 services:
   mariadb:
     image: "mariadb:latest"
     environment:
-      - MYSQL_ROOT_PASSWORD=okgreat
-      - MYSQL_USER=trinity
-      - MYSQL_PASSWORD=trinity
+      MYSQL_ROOT_PASSWORD: "okgreat"
+      MYSQL_USER: "trinity"
+      MYSQL_PASSWORD: "trinity"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "127.0.0.1"]
+      timeout: "20s"
+      retries: 10
     ports:
       - "3307:3306"
     volumes:
@@ -51,10 +61,28 @@ services:
       - "8081:80"
   keira2:
     build: ../keira2
+    environment:
+      TC_JSON_API_PORT: "8081"
     depends_on:
-      - tcjsonapi 
-    links:
-      - tcjsonapi:http
+      - tcjsonapi
     ports:
       - "8082:80"
-
+#
+# TODO: aowow is still a work in progress.
+#
+#  aowow:
+#    build: ../aowow
+#    environment:
+#      DB_HOST: mariadb
+#      DB_USERNAME: trinity
+#      DB_PASSWORD: trinity
+#      DB_DATABASE: aowow
+#    volumes:
+#      - ../../artifacts/mpqdata:/usr/local/aowow/setup/mpqdata
+#      - ../../World_of_Warcraft:/usr/local/World_of_Warcraft:ro
+#    depends_on:
+#      - mariadb
+#    links:
+#      - mariadb:mysql
+#    ports:
+#      - "8083:80"
