@@ -22,16 +22,19 @@ Some planned future improvements to this project are as follows:
       * https://github.com/Sarjuuk/aowow
       * https://github.com/neechbear/tcadmin
 
-  2. Harmonise `docker/trinitycore/docker-compose.yaml` to read and honor
+  2. Where possible, move parts of the main `Makefile` in sub-directories for
+     each of the `docker/*` containers, thus simplifying the main `Makefile`.
+
+  3. Harmonise `docker/trinitycore/docker-compose.yaml` to read and honor
      `Makefile` settings and variables.
 
-  3. Attempt to make Docker base container images work with Alpine, Ubuntu and
+  4. Attempt to make Docker base container images work with Alpine, Ubuntu and
      CentOS as well as Debian Jessie.
 
-  4. See what improvements can be incorporated from other similar projects like
+  5. See what improvements can be incorporated from other similar projects like
      https://github.com/azerothcore/docker-files/.
 
-  5. Add TravisCI and CodeClimate integration to the GitHub project.
+  6. Add TravisCI and CodeClimate integration to the GitHub project.
 
 
 ## License
