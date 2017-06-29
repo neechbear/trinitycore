@@ -16,11 +16,11 @@ Some planned future improvements to this project are as follows:
   1. Implement additional containers for database and SmartAI editing and
      browsing.
 
-    * https://github.com/ShinDarth/TC-JSON-API
-      * https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
-    * https://github.com/Helias/Keira2
-    * https://github.com/Sarjuuk/aowow
-    * https://github.com/neechbear/tcadmin
+      * https://github.com/ShinDarth/TC-JSON-API
+        * https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
+      * https://github.com/Helias/Keira2
+      * https://github.com/Sarjuuk/aowow
+      * https://github.com/neechbear/tcadmin
 
   2. Harmonise `docker/trinitycore/docker-compose.yaml` to read and honor
      `Makefile` settings and variables.
