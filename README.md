@@ -13,14 +13,8 @@ https://hub.docker.com/r/nicolaw/trinitycore/).
 
 Some planned future improvements to this project are as follows:
 
-  1. Implement additional containers for database and SmartAI editing and
-     browsing.
-
-      * https://github.com/ShinDarth/TC-JSON-API
-        * https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
-      * https://github.com/Helias/Keira2
-      * https://github.com/Sarjuuk/aowow
-      * https://github.com/neechbear/tcadmin
+  1. Implement additional container for aowow asset browsing
+     (https://github.com/Sarjuuk/aowow).
 
   2. Where possible, move parts of the main `Makefile` in sub-directories for
      each of the `docker/*` containers, thus simplifying the main `Makefile`.
@@ -35,6 +29,9 @@ Some planned future improvements to this project are as follows:
      https://github.com/azerothcore/docker-files/.
 
   6. Add TravisCI and CodeClimate integration to the GitHub project.
+
+  7. Bundle the `tcadmin` Bash completion command line tool somehow
+     (https://github.com/neechbear/tcadmin).
 
 
 ## License

@@ -132,6 +132,8 @@ Enjoy!
 TODO: Describe the following here (while linking to as many pre-existing
 TrinityCore forum and documentation resources as possible at the same time):
 
+  * Connecting to TC-JSON-RPC on port 8081 (http://yourserver:8081/public/index.php/).
+  * Connecting to Keira2 on port 8082 (http://yourserver:8082/Keira2/).
   * Inserting custom SQL before first `make run`.
   * Use of `worldserver` remote console.
   * Use of `worldserver` SOAP API.
