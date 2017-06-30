@@ -146,7 +146,7 @@ mapdata_rpm: $(MAP_DATA_RPM)
 # Build TrinityCore server inside a Docker container.
 $(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create/%:
 	mkdir -p $(ARTIFACTS) $(SOURCE_DIR)
-	docker build -t "nicolaw/trinitycore:latest" docker/build
+	docker build -t "tcbuild" docker/build
 	docker run -it --rm \
 		-v "${CURDIR}/$(ARTIFACTS)":/$(ARTIFACTS) \
 		-v "${CURDIR}/$(SOURCE_DIR)":/usr/local/src \
