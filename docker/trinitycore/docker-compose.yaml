@@ -70,7 +70,7 @@ services:
     build: ../keira2
     environment:
       TC_JSON_API_PORT: "8081"
-      TC_JSON_API_URL:
+      #TC_JSON_API_URL: "location.protocol + '//' + location.hostname + ':' + '${TC_JSON_API_PORT}' + '/public/index.php/'"
     depends_on:
       - tcjsonapi
     ports:
