@@ -58,7 +58,7 @@ RUN php artisan key:generate
 RUN php artisan jwt:generate
 RUN php artisan migrate --force || true
 
-CMD ["/bin/bash", "-c", "/bin/wait-for-it.sh ${DB_HOST}:${DB_PORT} -- /usr/bin/php -S ${BIND_IP}:${BIND_PORT} /usr/local/TC-JSON-API/server.php"]
+CMD ["/bin/bash", "-c", "/bin/wait-for-it.sh ${DB_HOST}:${DB_PORT} --timeout=0 --strict -- /usr/bin/php -S ${BIND_IP}:${BIND_PORT} /usr/local/TC-JSON-API/server.php"]
 
 # https://github.com/ShinDarth/TC-JSON-API/wiki/Search-routes.
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 --start-period=30s \
