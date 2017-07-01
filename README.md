@@ -20,7 +20,12 @@ Some planned future improvements to this project are as follows:
      each of the `docker/*` containers, thus simplifying the main `Makefile`.
 
   3. Harmonise `docker/trinitycore/docker-compose.yaml` to read and honor
-     `Makefile` settings and variables.
+     `Makefile` arguments, settings and variables.
+
+      * Split out `docker-compose.yaml` in to smaller chunks to allow easy
+        deployment of alternative configurations, such as using an external
+        database instead of deploying a MariaDB container.
+        (See https://docs.docker.com/compose/extends).
 
   4. Attempt to make Docker base container images work with Alpine, Ubuntu and
      CentOS as well as Debian Jessie.
@@ -32,6 +37,10 @@ Some planned future improvements to this project are as follows:
 
   7. Bundle the `tcadmin` Bash completion command line tool somehow
      (https://github.com/neechbear/tcadmin).
+
+  8. Document some more advanced use cases, such as a production/development
+     hybrid configuration sharing bare metal and Dockerised components in
+     unison.
 
 
 ## License
