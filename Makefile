@@ -4,10 +4,21 @@
 # Default username and password to create a GM user.
 DEFAULT_GM_USER = trinity
 DEFAULT_GM_PASSWORD = trinity
+DEFAULT_GM_ID = 1
 
 # Database hostname and port. Defaulted to Docker swarm container mariadb.
 DB_HOST = mariadb
 DB_PORT = 3306
+DB_USERNAME = trinity
+DB_PASSWORD = trinity
+DB_WORLD = world
+DB_CHARACTERS = characters
+DB_AUTH = auth
+
+# What realm ID and port should the worldserver identify itself as.
+WORLDSERVER_REALM_ID = 2
+WORLDSERVER_PORT = 8085
+WORLDSERVER_NAME = "TrinityCore"
 
 # Enable worldserver remote access and SOAP API by default.
 WORLDSERVER_RA = 1
@@ -179,7 +190,11 @@ $(MPQ_DATA_ARTIFACTS):
 # Create authserver and worldserver configuration files from their default
 # .conf.dist artifacts.
 $(CONF): $(DIST_CONF)
-	sed -e 's!127.0.0.1;3306;!$(DB_HOST);$(DB_PORT);!g;' \
+	sed \
+			-e 's!127.0.0.1;3306;trinity;trinity;auth!$(DB_HOST);$(DB_PORT);$(DB_USERNAME);$(DB_PASSWORD);$(DB_AUTH)!g;' \
+			-e 's!127.0.0.1;3306;trinity;trinity;characters!$(DB_HOST);$(DB_PORT);$(DB_USERNAME);$(DB_PASSWORD);$(DB_CHARACTERS)!g;' \
+			-e 's!127.0.0.1;3306;trinity;trinity;world!$(DB_HOST);$(DB_PORT);$(DB_USERNAME);$(DB_PASSWORD);$(DB_WORLD)!g;' \
+		  -e 's!^RealmID\s*=.*!RealmID = $(WORLDSERVER_REALM_ID)!g;' \
 		  -e 's!^DataDir\s*=.*!DataDir = "$(INSTALL_PREFIX)/$(MAP_DATA_DIR)"!g;' \
 			-e 's!^SourceDirectory\s*=.*!SourceDirectory = "$(INSTALL_PREFIX)"!g;' \
 			-e 's!^BuildDirectory\s*=.*!BuildDirectory = "$(INSTALL_PREFIX)/$(SOURCE_DIR)/TrinityCore/build"!g;' \
@@ -206,8 +221,8 @@ $(SQL_INITDB_ARTIFACTS)/001-permissions.sql: $(SQL_INITDB_ARTIFACTS) $(SQL_ARTIF
 
 # https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
 $(SQL_INITDB_ARTIFACTS)/002-tc-json-api-dbc.sql: $(SQL_INITDB_ARTIFACTS)
-	echo "CREATE DATABASE dbc DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;" >> "$@"
-	echo "GRANT ALL PRIVILEGES ON dbc . * TO 'trinity'@'%' WITH GRANT OPTION;" >> "$@"
+	echo "CREATE DATABASE IF NOT EXISTS dbc DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;" >> "$@"
+	echo "GRANT ALL PRIVILEGES ON dbc . * TO '$(DB_USERNAME)'@'%' WITH GRANT OPTION;" >> "$@"
 
 # https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
 $(SQL_INITDB_ARTIFACTS)/003-tc-json-api-dbc-achievements.sql: $(SQL_INITDB_ARTIFACTS)
@@ -216,8 +231,8 @@ $(SQL_INITDB_ARTIFACTS)/003-tc-json-api-dbc-achievements.sql: $(SQL_INITDB_ARTIF
 
 # https://github.com/Sarjuuk/aowow/blob/master/README.md
 $(SQL_INITDB_ARTIFACTS)/004-aowow.sql: $(SQL_INITDB_ARTIFACTS)
-	echo "CREATE DATABASE aowow DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;" >> "$@"
-	echo "GRANT ALL PRIVILEGES ON aowow . * TO 'trinity'@'%' WITH GRANT OPTION;" >> "$@"
+	echo "CREATE DATABASE IF NOT EXISTS aowow DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;" >> "$@"
+	echo "GRANT ALL PRIVILEGES ON aowow . * TO '$(DB_USERNAME)'@'%' WITH GRANT OPTION;" >> "$@"
 
 # https://github.com/Sarjuuk/aowow/blob/master/README.md
 $(SQL_INITDB_ARTIFACTS)/005-aowow-db-structures.sql: $(SQL_INITDB_ARTIFACTS)
@@ -227,15 +242,17 @@ $(SQL_INITDB_ARTIFACTS)/005-aowow-db-structures.sql: $(SQL_INITDB_ARTIFACTS)
 # Create custom SQL file for to be imported on first run that inserts a default
 # account username and password will full GM permissions.
 $(SQL_ADD_GM_USER): $(SQL_ARTIFACTS)/custom
-	@printf 'INSERT INTO account (id, username, sha_pass_hash) VALUES (%s, "%s", SHA1(CONCAT(UPPER("%s"),":",UPPER("%s"))));\n' \
-		"1" "$(DEFAULT_GM_USER)" "$(DEFAULT_GM_USER)" "$(DEFAULT_GM_PASSWORD)" > "$@"
-	@echo "INSERT INTO account_access VALUES (1,3,-1);" >> "$@"
+	@printf 'REPLACE INTO account (id,username,sha_pass_hash) VALUES (%s, "%s", SHA1(CONCAT(UPPER("%s"),":",UPPER("%s"))));\n' \
+		"$(DEFAULT_GM_ID)" "$(DEFAULT_GM_USER)" "$(DEFAULT_GM_USER)" "$(DEFAULT_GM_PASSWORD)" > "$@"
+	@echo "REPLACE INTO account_access (id,gmlevel,RealmID) VALUES ($(DEFAULT_GM_ID),3,-1);" >> "$@"
 
 # Create custom SQL file to be imported on first run that updates the IP
 # address of the worldserver to be something other than just localhost.
 $(SQL_FIX_REALMLIST): $(SQL_ARTIFACTS)/custom
-	printf 'UPDATE realmlist SET address = "%s" WHERE id = 1 AND address = "127.0.0.1";\n' \
-		"$(shell hostname -i | egrep -o '[0-9\.]{7,15}')" > "$@"
+	printf 'REPLACE INTO realmlist (id,name,address,port) VALUES ("%s","%s","%s","%s");\n' \
+		"$(WORLDSERVER_REALM_ID)" "$(WORLDSERVER_NAME)" \
+		"$(shell hostname -i | egrep -o '[0-9\.]{7,15}')" \
+		"$(WORLDSERVER_PORT)"	> "$@"
 
 # Copy binary build artifacts in to Docker container build directories.
 docker/%:

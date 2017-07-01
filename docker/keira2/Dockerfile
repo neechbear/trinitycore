@@ -20,6 +20,6 @@ RUN sed -r -e 's@^(\s*app\.defaultAPI\s*=\s*).+;@\1'"${TC_JSON_API_URL}"';@g;' \
 COPY index.html "/usr/local/apache2/htdocs/index.html"
 COPY htaccess "/usr/local/apache2/htdocs/.htaccess"
 
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 --start-period=30s \
+HEALTHCHECK --interval=60s --timeout=3s --retries=3 --start-period=30s \
   CMD curl -sSLf "${HEALTHCHECK_URL}" || exit 1
 

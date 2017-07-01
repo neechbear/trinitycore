@@ -9,9 +9,9 @@ services:
   mariadb:
     image: "mariadb:latest"
     environment:
-      MYSQL_ROOT_PASSWORD: "okgreat"
-      MYSQL_USER: "trinity"
-      MYSQL_PASSWORD: "trinity"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-okgreat}"
+      MYSQL_USER: "${DB_USERNAME:-trinity}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-trinity}"
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "127.0.0.1"]
       timeout: "20s"
@@ -23,6 +23,9 @@ services:
       - ../../artifacts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
   authserver:
     build: ../authserver
+    environment:
+      DB_HOST: "${DB_HOST:-mariadb}"
+      DB_PORT: "${DB_PORT:-3306}"
     depends_on:
       - mariadb
     links:
@@ -33,6 +36,9 @@ services:
       - ../../artifacts/etc:/opt/trinitycore/etc
   worldserver:
     build: ../worldserver
+    environment:
+      DB_HOST: "${DB_HOST:-mariadb}"
+      DB_PORT: "${DB_PORT:-3306}"
     depends_on:
       - mariadb
     links:
@@ -48,9 +54,10 @@ services:
   tcjsonapi:
     build: ../tcjsonapi
     environment:
-      DB_HOST: mariadb
-      DB_USERNAME: trinity
-      DB_PASSWORD: trinity
+      DB_HOST: "${DB_HOST:-mariadb}"
+      DB_PORT: "${DB_PORT:-3306}"
+      DB_USERNAME: "${DB_USERNAME:-trinity}"
+      DB_PASSWORD: "${DB_PASSWORD:-trinity}"
       BIND_IP: "0.0.0.0"
       BIND_PORT: "80"
     depends_on:
@@ -63,6 +70,7 @@ services:
     build: ../keira2
     environment:
       TC_JSON_API_PORT: "8081"
+      TC_JSON_API_URL:
     depends_on:
       - tcjsonapi
     ports:
@@ -73,10 +81,10 @@ services:
 #  aowow:
 #    build: ../aowow
 #    environment:
-#      DB_HOST: mariadb
-#      DB_USERNAME: trinity
-#      DB_PASSWORD: trinity
-#      DB_DATABASE: aowow
+#      DB_HOST: "${DB_HOST:-mariadb}"
+#      DB_USERNAME: "${DB_USERNAME:-trinity}"
+#      DB_PASSWORD: "${DB_USERNAME:-trinity}"
+#      DB_AOWOW: "${DB_AOWOW:-aowow}"
 #    volumes:
 #      - ../../artifacts/mpqdata:/usr/local/aowow/setup/mpqdata
 #      - ../../World_of_Warcraft:/usr/local/World_of_Warcraft:ro

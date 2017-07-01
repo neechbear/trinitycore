@@ -6,7 +6,7 @@
 set -u
 
 main() {
-  "${BASH_SOURCE[0]%/*}/wait-for-it.sh" "mariadb:3306" --timeout=0 --strict --child
+  "${BASH_SOURCE[0]%/*}/wait-for-it.sh" "${DB_HOST}:${DB_PORT}" --timeout=0 --strict --child
   echo "Starting worldserver ..."
   exec "${BASH_SOURCE[0]%/*}/worldserver" || {
     >&2 echo -e "\033[0;1;31mworldserver exited with exit-code $?\033[0m"

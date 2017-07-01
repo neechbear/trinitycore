@@ -6,7 +6,7 @@
 set -u
 
 main() {
-  "${BASH_SOURCE[0]%/*}/wait-for-it.sh" "mariadb:3306" --timeout=0 --strict --child
+  "${BASH_SOURCE[0]%/*}/wait-for-it.sh" "${DB_HOST}:${DB_PORT}" --timeout=0 --strict --child
   sleep 15
   echo "Starting authserver ..."
   exec "${BASH_SOURCE[0]%/*}/authserver" || {

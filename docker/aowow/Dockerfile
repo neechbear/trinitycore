@@ -27,9 +27,9 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
 
 ENV DB_HOST mariadb
 ENV DB_PORT 3306
-ENV DB_DATABASE aowow
 ENV DB_USERNAME trinity
 ENV DB_PASSWORD trinity
+ENV DB_AOWOW aowow
 
 ENV BIND_IP 0.0.0.0
 ENV BIND_PORT 80
