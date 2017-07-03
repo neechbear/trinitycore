@@ -3,7 +3,11 @@
 set -euo pipefail
 
 to_hash() {
-  tr 'a-z' 'A-Z' | sha1sum | cut -d' ' -f1
+  declare sha1sum=""
+  for sha1sum in sha1sum shasum sha1 ; do
+    type -P "$sha1sum" >/dev/null 2>&1 && break
+  done
+  tr 'a-z' 'A-Z' | "$sha1sum" | cut -d' ' -f1
 }
 
 main() {
