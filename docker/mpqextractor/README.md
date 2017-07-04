@@ -13,6 +13,7 @@ This is a work-in-progress.
       && docker run -it \
           -v $PWD/artifacts:/artifacts \
           -v $PWD/source:/usr/local/src \
+          -v $PWD/../../World_of_Warcraft:/World_of_Warcraft \
           mpqextractor
     
     LD_LIBRARY_PATH=./artifacts/bin ./artifacts/bin/MPQExtractor

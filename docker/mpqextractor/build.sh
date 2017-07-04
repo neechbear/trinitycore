@@ -127,6 +127,8 @@ main() {
 
   # Build MPQExtractor.
   build
+  export PATH="$PATH:${cmdarg_cfg[output]%/}/bin"
+  export LD_LIBRARY_PATH="${cmdarg_cfg[output]%/}/bin"
 
   # Save Git revision.
   git -C "${cmdarg_cfg[source]%/}/MPQExtractor" rev-parse HEAD > "${cmdarg_cfg[output]%/}/git-rev"
