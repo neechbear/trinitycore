@@ -1,5 +1,7 @@
 # Dockerised TrinityCore 3.3.5
 
+![Stars](https://img.shields.io/docker/stars/nicolaw/trinitycore.svg) ![Pulls](https://img.shields.io/docker/pulls/nicolaw/trinitycore.svg) ![Build](https://img.shields.io/docker/automated/jrottenberg/trinitycore.svg)
+
 TrinityCore build environment and wrapper.
 
 
