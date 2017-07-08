@@ -1,0 +1,8 @@
+declare -g TCMC_COMP_AOWOW=''
+declare -g TCMC_COMP_AUTHSERVER=ON
+declare -g TCMC_COMP_DATABASE=ON
+declare -g TCMC_COMP_KEIRA2=ON
+declare -g TCMC_COMP_TCJSONAPI=ON
+declare -g TCMC_COMP_WORLDSERVER=ON
+declare -g TCMC_DB_EXTERNAL=''
+declare -g TCMC_FIRSTRUN=0

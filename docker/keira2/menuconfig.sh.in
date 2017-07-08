@@ -1,0 +1,7 @@
+MENUORDER=4
+LISTEN="80/tcp"
+EXPOSE="8081:80"
+NAME="TC-JSON-API"
+TITLE="TC-JSON-API"
+SUMMARY="TrinityCore JSON API"
+DESCRIPTION="Restful JSON API to query TrinityCore databases."
