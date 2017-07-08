@@ -10,8 +10,11 @@ ufw_applications() {
 TrinityCore AuthServer
 TrinityCore BattleNet
 TrinityCore WorldServer
-TrinityCore WorldServer RA
+TrinityCore WorldServer Console
 TrinityCore WorldServer SOAP
+AoWoW
+TC-JSON-API
+Keira2
 EOM
 }
 

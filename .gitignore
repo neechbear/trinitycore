@@ -1,3 +1,4 @@
+mapdata/*
 artifacts/*
 *.deb
 *.rpm

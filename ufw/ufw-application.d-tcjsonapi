@@ -1,0 +1,11 @@
+# https://us.battle.net/support/en/article/300479
+# Copy this file into /etc/ufw/applications.d, then run:
+#   ufw reload
+#   ufw app list
+#   ufw allow from "$net" to any app "$app"
+
+[TC-JSON-API]
+title=TC-JSON-API
+description=TrinityCore RESTful API built with Laravel
+ports=8081/tcp
+

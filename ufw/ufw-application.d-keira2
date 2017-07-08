@@ -1,0 +1,11 @@
+# https://us.battle.net/support/en/article/300479
+# Copy this file into /etc/ufw/applications.d, then run:
+#   ufw reload
+#   ufw app list
+#   ufw allow from "$net" to any app "$app"
+
+[Keira2]
+title=Keira2
+description=The TrinityCore Database Web-Editor
+ports=8082/tcp
+
