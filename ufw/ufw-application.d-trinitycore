@@ -17,7 +17,7 @@ ports=1119/tcp
 [TrinityCore WorldServer]
 title=TrinityCore WoldServer
 description=World of Warcraft private server
-ports=8085/tcp
+ports=8085:8089/tcp
 
 [TrinityCore WorldServer Console]
 title=TrinityCore WorldServer Remote Console

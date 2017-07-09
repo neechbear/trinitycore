@@ -5,17 +5,26 @@
 
 set -Euo pipefail
 
+ufw_application_files() {
+  echo "${BASH_SOURCE[0]%/*}"/ufw-application.d-*
+}
+
 ufw_applications() {
-  cat <<EOM
-TrinityCore AuthServer
-TrinityCore BattleNet
-TrinityCore WorldServer
-TrinityCore WorldServer Console
-TrinityCore WorldServer SOAP
-AoWoW
-TC-JSON-API
-Keira2
-EOM
+  declare appfile=""
+  for appfile in $(ufw_application_files); do
+    egrep -how '\[.+?\]' "$appfile" | tr -d '[]'
+  done
+}
+
+ufw_install_applications() {
+  declare instpath="$1"
+  declare appfile=""
+  for appfile in $(ufw_application_files); do
+    declare shortname="${appfile##*/ufw-application.d-}"
+    if [[ ! -e "${instpath%/}/$shortname" ]]; then
+      cp -v "$appfile" "${instpath%/}/$shortname"
+    fi
+  done
 }
 
 my_networks() {
@@ -32,6 +41,8 @@ EOM
 }
 
 main() {
+  ufw_install_applications "/etc/ufw/applications.d"
+
   declare app="" net=""
   while read -r net ; do
     while read -r app ; do
