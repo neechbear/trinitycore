@@ -141,6 +141,9 @@ TrinityCore forum and documentation resources as possible at the same time):
   * Launching the Docker swarm into the background as a daemon.
   * Changing `authserver.conf` and `worldserver.conf`.
   * Connecting to the MariaDB database.
+  * Add links to GMGenie add-on (eg. https://neech.me.uk/#GM%20Genie).
+  * Document how to run directly with `docker-compose`.
+  * Document new `make menuconfig` wizard based on `dialog`.
 
 
 ## See Also
