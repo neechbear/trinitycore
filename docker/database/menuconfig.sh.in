@@ -1,10 +1,6 @@
-MENUORDER=9
-LISTEN="80/tcp"
-EXPOSE="8083:80"
-NAME="aowow"
-TITLE="AoWoW"
-SUMMARY="Searchable WoW Database Website"
-DESCRIPTION="AoWoW is a clone of the popular Wowhead website that provides a
-searchable database, internet forum, guides and player character services for
-the popular massively multiplayer online role-playing game World of Warcraft
-(WoW)."
+LISTEN="3306/tcp"
+EXPOSE="3307:3306"
+NAME="database"
+TITLE="MariaDB"
+SUMMARY="Backing Database for TrinityCore"
+DESCRIPTION="$SUMMARY"

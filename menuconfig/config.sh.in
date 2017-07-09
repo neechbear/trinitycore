@@ -5,4 +5,6 @@ declare -g TCMC_COMP_KEIRA2=ON
 declare -g TCMC_COMP_TCJSONAPI=ON
 declare -g TCMC_COMP_WORLDSERVER=ON
 declare -g TCMC_DB_EXTERNAL=''
+declare -g TCMC_DOCKER_COMPOSE_CONF=/opt/trinitycore/menuconfig/../docker/custom-menuconfig.yaml
+declare -g TCMC_EXTERNAL_DB=''
 declare -g TCMC_FIRSTRUN=0

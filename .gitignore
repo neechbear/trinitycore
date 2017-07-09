@@ -1,3 +1,5 @@
+menuconfig/examples/*
+docker/custom-menuconfig.yaml
 mapdata/*
 artifacts/*
 *.deb

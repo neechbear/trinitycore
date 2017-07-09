@@ -1,7 +1,6 @@
-MENUORDER=2
-LISTEN="3724/tcp"
-EXPOSE="3724:3724"
-NAME="authserver"
-TITLE="Auth Server"
-SUMMARY="TrinityCore Authentication Server"
-DESCRIPTION="Logon and authentication server."
+LISTEN="8085:8089/tcp"
+EXPOSE="8085:8085 8086:8086 8087:8087 8088:8088 8089:8089"
+NAME="worldserver"
+TITLE="World Server"
+SUMMARY="TrinityCore Realm World Server"
+DESCRIPTION="Realm world server."

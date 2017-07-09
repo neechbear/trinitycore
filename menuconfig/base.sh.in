@@ -1,1 +1,5 @@
-FIRSTRUN_TITLE="TrinityCore Configuration"
+BACK_TITLE="Dockerised TrinityCore Configuration"
+FIRSTRUN_TITLE="Introduction"
+DOCKERFILES="${BASH_SOURCE[0]%/*}/../docker"
+TCMC_DOCKER_COMPOSE_CONF="${DOCKERFILES%//}/custom-menuconfig.yaml"
+TCMC_EXTERNAL_DB=""

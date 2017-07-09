@@ -1,10 +1,6 @@
-MENUORDER=9
-LISTEN="80/tcp"
-EXPOSE="8083:80"
-NAME="aowow"
-TITLE="AoWoW"
-SUMMARY="Searchable WoW database website"
-DESCRIPTION="AoWoW is a clone of the popular Wowhead website that provides a
-searchable database, internet forum, guides and player character services for
-the popular massively multiplayer online role-playing game World of Warcraft
-(WoW)."
+LISTEN="3724/tcp"
+EXPOSE="3724:3724"
+NAME="authserver"
+TITLE="Auth Server"
+SUMMARY="TrinityCore Authentication Server"
+DESCRIPTION="Logon and authentication server."

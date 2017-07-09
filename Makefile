@@ -25,6 +25,8 @@ WORLDSERVER_RA = 1
 WORLDSERVER_RA_IP = 0.0.0.0
 WORLDSERVER_SOAP = 1
 WORLDSERVER_SOAP_IP = 0.0.0.0
+# https://github.com/TrinityCore/TrinityCore/issues/9998
+WORLDSERVER_CONSOLE = 0
 
 # Location of WoW game client files, used to generate worldserver map data.
 GAME_CLIENT = World_of_Warcraft
@@ -99,7 +101,6 @@ INSTALL_PREFIX = /opt/trinitycore
 #
 
 help:
-	@echo ""
 	@echo "Use 'make build' to build the TrinityCore server binaries."
 	@echo "Use 'make mapdata' to generate worldserver map data from the WoW game client."
 	@echo "Use 'make run' to launch the TrinityCore servers inside a Docker swarm."
@@ -109,7 +110,6 @@ help:
 	@echo "Use 'make springclean' to destroy the MariaDB and configuration files."
 	@echo ""
 	@echo "Refer to https://github.com/neechbear/trinitycore/blob/master/GettingStarted.md for additional help."
-	@echo ""
 
 # Download and compile TrinityCore inside a Docker container.
 build: $(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)
@@ -123,7 +123,7 @@ run: $(BINARIES) $(CONF) $(MAP_DATA) \
 		$(SQL_FIX_REALMLIST) $(SQL_ADD_GM_USER) $(SQL_IMPORT) $(SQL_TDB_WORLDSERVER) \
 		docker/worldserver/worldserver docker/authserver/authserver
 	mkdir -p $(MYSQL_ARTIFACTS)
-	cd docker/trinitycore && docker-compose up --build
+	cd docker && docker-compose up --build
 
 # Clean ALL artifacts, source and MariaDB / mysql database files.
 clean:
@@ -155,7 +155,7 @@ mapdata_rpm: $(MAP_DATA_RPM)
 #
 
 # Build TrinityCore server inside a Docker container.
-$(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create/%:
+$(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create:
 	mkdir -p $(ARTIFACTS) $(SOURCE_DIR)
 	docker build -t "tcbuild" docker/build
 	docker run -it --rm \
@@ -202,6 +202,7 @@ $(CONF): $(DIST_CONF)
 			-e 's!^Ra\.IP\s*=.*!Ra.IP = "$(WORLDSERVER_RA_IP)"!g;' \
 			-e 's!^SOAP\.Enabled\s*=.*!SOAP.Enabled = $(WORLDSERVER_SOAP)!g;' \
 			-e 's!^SOAP\.IP\s*=.*!SOAP.IP = "$(WORLDSERVER_SOAP_IP)"!g;' \
+			-e 's!^Console\.Enable\s*=.*!Console.Enable = $(WORLDSERVER_CONSOLE)!g;' \
 			< "$@.dist" > "$@"
 
 # Copy the TDB TrinityCore inintal full world database SQL import files in to
@@ -221,7 +222,7 @@ $(SQL_INITDB_ARTIFACTS)/001-permissions.sql: $(SQL_INITDB_ARTIFACTS) $(SQL_ARTIF
 
 # https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
 $(SQL_INITDB_ARTIFACTS)/002-tc-json-api-dbc.sql: $(SQL_INITDB_ARTIFACTS)
-	echo "CREATE DATABASE IF NOT EXISTS dbc DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;" >> "$@"
+	echo "CREATE DATABASE IF NOT EXISTS dbc DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;" > "$@"
 	echo "GRANT ALL PRIVILEGES ON dbc . * TO '$(DB_USERNAME)'@'%' WITH GRANT OPTION;" >> "$@"
 
 # https://github.com/ShinDarth/TC-JSON-API/blob/master/INSTALL.md
@@ -251,7 +252,7 @@ $(SQL_ADD_GM_USER): $(SQL_ARTIFACTS)/custom
 $(SQL_FIX_REALMLIST): $(SQL_ARTIFACTS)/custom
 	printf 'REPLACE INTO realmlist (id,name,address,port) VALUES ("%s","%s","%s","%s");\n' \
 		"$(WORLDSERVER_REALM_ID)" "$(WORLDSERVER_NAME)" \
-		"$(shell hostname -i | egrep -o '[0-9\.]{7,15}')" \
+		"$(shell hostname -i | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' | head -1)" \
 		"$(WORLDSERVER_PORT)"	> "$@"
 
 # Copy binary build artifacts in to Docker container build directories.

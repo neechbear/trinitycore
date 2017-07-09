@@ -19,10 +19,10 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - ../../artifacts/mysql:/var/lib/mysql
-      - ../../artifacts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ../artifacts/mysql:/var/lib/mysql
+      - ../artifacts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
   authserver:
-    build: ../authserver
+    build: authserver
     environment:
       DB_HOST: "${DB_HOST:-mariadb}"
       DB_PORT: "${DB_PORT:-3306}"
@@ -33,9 +33,9 @@ services:
     ports:
       - "3724:3724"
     volumes:
-      - ../../artifacts/etc:/opt/trinitycore/etc
+      - ../artifacts/etc:/opt/trinitycore/etc
   worldserver:
-    build: ../worldserver
+    build: worldserver
     environment:
       DB_HOST: "${DB_HOST:-mariadb}"
       DB_PORT: "${DB_PORT:-3306}"
@@ -48,11 +48,11 @@ services:
       - "3443:3443"
       - "7878:7878"
     volumes:
-      - ../../artifacts/etc:/opt/trinitycore/etc
-      - ../../artifacts/mapdata:/opt/trinitycore/mapdata
-      - ../../artifacts/sql:/opt/trinitycore/sql
+      - ../artifacts/etc:/opt/trinitycore/etc
+      - ../artifacts/mapdata:/opt/trinitycore/mapdata
+      - ../artifacts/sql:/opt/trinitycore/sql
   tcjsonapi:
-    build: ../tcjsonapi
+    build: tcjsonapi
     environment:
       DB_HOST: "${DB_HOST:-mariadb}"
       DB_PORT: "${DB_PORT:-3306}"
@@ -67,7 +67,7 @@ services:
     ports:
       - "8081:80"
   keira2:
-    build: ../keira2
+    build: keira2
     environment:
       TC_JSON_API_PORT: "8081"
       #TC_JSON_API_URL: "location.protocol + '//' + location.hostname + ':' + '${TC_JSON_API_PORT}' + '/public/index.php/'"
@@ -79,15 +79,15 @@ services:
 # TODO: aowow is still a work in progress.
 #
 #  aowow:
-#    build: ../aowow
+#    build: aowow
 #    environment:
 #      DB_HOST: "${DB_HOST:-mariadb}"
 #      DB_USERNAME: "${DB_USERNAME:-trinity}"
 #      DB_PASSWORD: "${DB_USERNAME:-trinity}"
 #      DB_AOWOW: "${DB_AOWOW:-aowow}"
 #    volumes:
-#      - ../../artifacts/mpqdata:/usr/local/aowow/setup/mpqdata
-#      - ../../World_of_Warcraft:/usr/local/World_of_Warcraft:ro
+#      - ../artifacts/mpqdata:/usr/local/aowow/setup/mpqdata
+#      - ../World_of_Warcraft:/usr/local/World_of_Warcraft:ro
 #    depends_on:
 #      - mariadb
 #    links:

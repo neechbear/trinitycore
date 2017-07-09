@@ -1,7 +1,6 @@
-MENUORDER=4
 LISTEN="80/tcp"
-EXPOSE="8081:80"
-NAME="TC-JSON-API"
-TITLE="TC-JSON-API"
-SUMMARY="TrinityCore JSON API"
-DESCRIPTION="Restful JSON API to query TrinityCore databases."
+EXPOSE="8082:80"
+NAME="keira2"
+TITLE="Keira2"
+SUMMARY="The TrinityCore Database Web-Editor"
+DESCRIPTION=""
