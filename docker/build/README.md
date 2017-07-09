@@ -59,7 +59,7 @@ https://github.com/neechbear/trinitycore/blob/master/GettingStarted.md.
 
 ## Caching & Debugging
 
-If you are experiencing build failures or wish to preform repeated build
+If you are experiencing build failures or wish to perform repeated build
 attempts to debug a problem, you may wish to use the `--shell`, `--reference`
 and `--tdb` options.
 
