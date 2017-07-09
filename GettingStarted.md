@@ -42,7 +42,7 @@ following from your Linux shell:
 
 ## Installation
 
-You will need to preform 4 distinct steps in order to start your private
+You will need to perform 4 distinct steps in order to start your private
 TrinityCore server, (and start playing on it).
 
   1. Compile the TrinityCore server.
@@ -74,7 +74,7 @@ in your current path.
 
 ### Generating Map Data
 
-This process needs to read the data files from your copy of the World of Warcaft
+This process needs to read the data files from your copy of the World of Warcraft
 game client.
 
 You should copy your game client (usually in `C:\Program Files
