@@ -22,8 +22,8 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
 
-ENV GM_USER trinity
-ENV GM_PASSWORD trinity
+ENV DEFAULT_GM_USER trinity
+ENV DEFAULT_GM_PASSWORD trinity
 
 # Configurable via INSTALL_PREFIX from the Makefile, and/or using
 # --define CMAKE_INSTALL_PREFIX=/your/path with the docker/build/ container,
@@ -56,6 +56,6 @@ ENTRYPOINT ["./worldserver.sh"]
 
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 --start-period=30s \
   CMD "${install_prefix}/bin/tcadmin" --soaphost=127.0.0.1 --soapport=7878 \
-    "--soapuser=${GM_USER}" "--soappass=${GM_PASSWORD}" \
+    "--soapuser=${DEFAULT_GM_USER}" "--soappass=${DEFAULT_GM_PASSWORD}" \
     server info || exit 1
 

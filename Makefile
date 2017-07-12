@@ -5,15 +5,21 @@
 DEFAULT_GM_USER = trinity
 DEFAULT_GM_PASSWORD = trinity
 DEFAULT_GM_ID = 1
+export DEFAULT_GM_USER DEFAULT_GM_PASSWORD DEFAULT_GM_ID
 
 # Database hostname and port. Defaulted to Docker swarm container mariadb.
 DB_HOST = mariadb
 DB_PORT = 3306
+DB_ROOT_PASSWORD = okgreat
 DB_USERNAME = trinity
 DB_PASSWORD = trinity
 DB_WORLD = world
 DB_CHARACTERS = characters
 DB_AUTH = auth
+DB_DBC = dbc
+DB_AOWOW = aowow
+export DB_HOST DB_PORT DB_ROOT_PASSWORD DB_USERNAME DB_PASSWORD
+export DB_WORLD DB_CHARACTERS DB_AUTH DB_DBC DB_AOWOW
 
 # What realm ID and port should the worldserver identify itself as.
 WORLDSERVER_REALM_ID = 2
