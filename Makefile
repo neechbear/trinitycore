@@ -123,7 +123,7 @@ run: $(BINARIES) $(CONF) $(MAP_DATA) \
 		$(SQL_FIX_REALMLIST) $(SQL_ADD_GM_USER) $(SQL_IMPORT) $(SQL_TDB_WORLDSERVER) \
 		docker/worldserver/worldserver docker/authserver/authserver
 	mkdir -p $(MYSQL_ARTIFACTS)
-	cd docker/trinitycore && docker-compose up --build
+	cd docker && docker-compose up --build
 
 # Clean ALL artifacts, source and MariaDB / mysql database files.
 clean:
