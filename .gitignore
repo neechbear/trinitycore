@@ -17,3 +17,4 @@ docker/tools/mmaps_generator
 docker/tools/vmap4assembler
 docker/tools/vmap4extractor
 redpath.sh
+menuconfig/examples/*
