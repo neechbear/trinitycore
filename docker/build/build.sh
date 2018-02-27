@@ -182,7 +182,17 @@ build() {
     extra_cmake_args+=("-Wno-dev")
   fi
 
-  # TODO: Add support for ${cmdarg_cfg[clang]} to change compiler to clang.
+  # ${cmdarg_cfg[clang]} to change compiler to clang.
+  # TODO: Fix this so it properly flips between clang and gcc. I've not read the
+  #       documentation yet, so I don't know what I'm doing. This is a quick
+  #       hack to get it working for someone else.
+  if [[ "${cmdarg_cfg[clang]}" == true ]]; then
+    update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
+    update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang 100
+  #else
+  #  update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
+  #  update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang 100
+  fi
 
   # Report our define -D settings.
   declare i=""

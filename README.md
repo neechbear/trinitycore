@@ -8,6 +8,8 @@ the TrinityCore build container, (published as Docker image
 `nicolaw/trinitycore` on Docker Hub at
 https://hub.docker.com/r/nicolaw/trinitycore/).
 
+See https://github.com/neechbear/trinitycore-gce for TrinityCore on Google
+Cloud Platform.
 
 ## Todo
 

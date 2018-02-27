@@ -164,6 +164,7 @@ $(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create/%:
 		"tcbuild" \
 		--branch "$(BRANCH)" \
 		--define "CMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)" \
+		--clang \
 		--verbose
 
 # Generate worldserver map data from World of Warcraft game client data inside a

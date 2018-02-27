@@ -1,46 +1,46 @@
 # MIT License
 # Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
 
-FROM debian:jessie
+FROM debian:stretch
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
-    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
-    software-properties-common python-software-properties \
- < /dev/null > /dev/null
+#RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
+#    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
+#    software-properties-common python-software-properties \
+# < /dev/null > /dev/null
 
-RUN add-apt-repository ppa:nicolaw/blip && \
-    sed -i 's/jessie/trusty/g' /etc/apt/sources.list.d/nicolaw-blip-jessie.list
+#RUN add-apt-repository ppa:nicolaw/blip && \
+#    sed -i 's/jessie/trusty/g' /etc/apt/sources.list.d/nicolaw-blip-jessie.list
 
 # https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
 # https://trinitycore.atlassian.net/wiki/display/tc/Requirements
 RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
-    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
-    blip \
+    apt-get -qq -o Dpkg::Use-Pty=0 install -y \
+    bc \
+    #blip \
+    clang \
     cmake \
+    curl \
     g++ \
     gcc \
     git \
     jq \
     make \
     p7zip-full \
-    libboost1.55-dev \
-    libboost-filesystem1.55-dev \
-    libboost-iostreams1.55-dev \
-    libboost-program-options1.55-dev \
-    libboost-regex1.55-dev \
-    libboost-system1.55-dev \
-    libboost-thread1.55-dev \
-    libssl-dev \
-    libmysqlclient-dev \
-    libreadline6-dev \
+    libboost-all-dev \
+    libssl1.0-dev \
+    libmariadbclient-dev \
+    libreadline-dev \
     zlib1g-dev \
     libbz2-dev \
-    libncurses5-dev \
+    libncurses-dev \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
+
+ADD https://github.com/neechbear/blip/releases/download/v0.10-1/blip_0.10-1_all.deb /tmp/blip.deb
+RUN dpkg -i /tmp/blip.deb && rm -f /tmp/blip.deb
 
 WORKDIR /
 

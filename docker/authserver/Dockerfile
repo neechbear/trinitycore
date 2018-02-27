@@ -1,20 +1,20 @@
 # MIT License
 # Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
 
-FROM debian:jessie
+FROM debian:stretch
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
     apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
-    libboost-filesystem1.55 \
-    libboost-iostreams1.55 \
-    libboost-program-options1.55 \
-    libboost-system1.55 \
-    libboost-thread1.55 \
+    libboost-filesystem \
+    libboost-iostreams \
+    libboost-program-options \
+    libboost-system \
+    libboost-thread \
     libssl1.0.0 \
-    libmysqlclient18 \
+    libmariadbclient18 \
     netcat \
  < /dev/null > /dev/null \
  && rm -rf /var/lib/apt/lists/*
