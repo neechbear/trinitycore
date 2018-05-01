@@ -8,12 +8,13 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
     apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
-    libboost-filesystem \
-    libboost-iostreams \
-    libboost-program-options \
-    libboost-system \
-    libboost-thread \
-    libssl1.0.0 \
+    libboost-filesystem1.62.0 \
+    libboost-iostreams1.62.0 \
+    libboost-program-options1.62.0 \
+    libboost-system1.62.0 \
+    libboost-thread1.62.0 \
+    libboost-regex1.62.0 \
+    libssl1.1 \
     libmariadbclient18 \
     netcat \
  < /dev/null > /dev/null \
