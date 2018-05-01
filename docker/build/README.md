@@ -4,6 +4,9 @@
 
 TrinityCore build environment and wrapper.
 
+Also see https://github.com/neechbear/trinitycore-gce for a similar
+project targeted at running TrinityCore on Google Cloud Platform.
+
 
 ## Overview 
 
@@ -99,6 +102,7 @@ https://github.com/neechbear/trinitycore/blob/master/docker/README.md.
 
 Related works by the same author:
 
+* https://github.com/neechbear/trinitycore-gce
 * https://github.com/neechbear/trinitycore
 * https://hub.docker.com/r/nicolaw/trinitycore
 * https://github.com/neechbear/tcadmin
