@@ -147,6 +147,7 @@ TrinityCore forum and documentation resources as possible at the same time):
 
 Related works by the same author:
 
+  * https://github.com/neechbear/trinitycore-gce
   * https://github.com/neechbear/trinitycore
   * https://hub.docker.com/r/nicolaw/trinitycore
   * https://github.com/neechbear/tcadmin
