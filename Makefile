@@ -47,7 +47,7 @@ SQL_FIX_REALMLIST = $(SQL_ARTIFACTS)/custom/auth/fix_realmlist.sql
 SQL_ADD_GM_USER = $(SQL_ARTIFACTS)/custom/auth/add_gm_user.sql
 
 # TDB database files used by worldserver to initialise the world database.
-SQL_TDB = $(notdir $(wildcard $(SQL_ARTIFACTS)/TDB_*/*.sql))
+SQL_TDB = $(notdir $(wildcard $(SQL_ARTIFACTS)/TDB_*.sql))
 SQL_TDB_WORLDSERVER = $(addprefix docker/worldserver/, $(SQL_TDB))
 
 # Version of TrinityCore we are compiling, packaging and running.
@@ -209,7 +209,7 @@ $(CONF): $(DIST_CONF)
 # the worldserver Docker container build directory so it can be imported on the
 # first fun.
 $(SQL_TDB_WORLDSERVER):
-	cp -r $(SQL_ARTIFACTS)/TDB_*/"$(notdir $@)" docker/worldserver
+	cp -r $(SQL_ARTIFACTS)/"$(notdir $@)" docker/worldserver
 
 $(SQL_INITDB_ARTIFACTS):
 	mkdir -p "$@"
