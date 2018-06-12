@@ -17,6 +17,7 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
     libboost-regex1.62.0 \
     libssl1.1 \
     libmariadbclient18 \
+    libreadline7 \
     mariadb-client \
     netcat \
     xml2 \

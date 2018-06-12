@@ -14,7 +14,7 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
     libboost-system1.62.0 \
     libboost-thread1.62.0 \
     libboost-regex1.62.0 \
-    libssl1.1 \
+    libssl1.0.2 \
     libmariadbclient18 \
     netcat \
  < /dev/null > /dev/null \
