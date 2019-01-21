@@ -27,10 +27,10 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
     libboost-regex1.62.0 \
     libssl1.1 \
     libmariadbclient18 \
- < /dev/null > /dev/null \
- && rm -rf /var/lib/apt/lists/*
+    < /dev/null > /dev/null \
+    && rm -rf /var/lib/apt/lists/*
 
-ADD https://github.com/neechbear/blip/releases/download/v0.10-1/blip_0.10-1_all.deb /tmp/blip.deb
+ADD https://github.com/neechbear/blip/releases/download/v0.10/blip_0.10-1_all.deb /tmp/blip.deb
 RUN dpkg -i /tmp/blip.deb && rm -f /tmp/blip.deb
 
 ENV install_prefix /opt/trinitycore
