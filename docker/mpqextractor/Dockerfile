@@ -1,24 +1,15 @@
 # MIT License
-# Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
+# Copyright (c) 2017-2020 Nicola Worthington <nicolaw@tfb.net>
 
-FROM debian:stretch
+FROM debian:10
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
 ENV DEBIAN_FRONTEND noninteractive
 
-#RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
-#    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
-#    software-properties-common python-software-properties \
-# < /dev/null > /dev/null
-
-#RUN add-apt-repository ppa:nicolaw/blip && \
-#    sed -i 's/jessie/trusty/g' /etc/apt/sources.list.d/nicolaw-blip-jessie.list
-
 # https://github.com/Kanma/MPQExtractor
-RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
-    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
+RUN apt-get -qq -o Dpkg::Use-Pty=0 update \
+ && apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     bc \
-    #blip \
     clang \
     cmake \
     curl \
@@ -29,10 +20,14 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
     zlib1g-dev \
     libbz2-dev \
  < /dev/null > /dev/null \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 \
+ && update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang 100
 
-ADD https://github.com/neechbear/blip/releases/download/v0.10-1/blip_0.10-1_all.deb /tmp/blip.deb
-RUN dpkg -i /tmp/blip.deb && rm -f /tmp/blip.deb
+RUN curl -sSL https://github.com/neechbear/blip/releases/download/v0.10/blip-0.10.tar.gz \
+ | tar -zxvf - \
+ && cd blip-0.10/ \
+ && make install prefix=/usr
 
 WORKDIR /
 

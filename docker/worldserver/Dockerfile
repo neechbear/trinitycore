@@ -1,22 +1,22 @@
 # MIT License
-# Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
+# Copyright (c) 2017-2020 Nicola Worthington <nicolaw@tfb.net>
 
-FROM debian:stretch
+FROM debian:10
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get -qq -o Dpkg::Use-Pty=0 update && \
-    apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
+RUN apt-get -qq -o Dpkg::Use-Pty=0 update \
+ && apt-get -qq -o Dpkg::Use-Pty=0 install -y --no-install-recommends \
     curl \
-    libboost-filesystem1.62.0 \
-    libboost-iostreams1.62.0 \
-    libboost-program-options1.62.0 \
-    libboost-system1.62.0 \
-    libboost-thread1.62.0 \
-    libboost-regex1.62.0 \
+    libboost-filesystem1.67.0 \
+    libboost-iostreams1.67.0 \
+    libboost-program-options1.67.0 \
+    libboost-regex1.67.0 \
+    libboost-system1.67.0 \
+    libboost-thread1.67.0 \
+    libmariadb3 \
     libssl1.1 \
-    libmariadbclient18 \
     mariadb-client \
     netcat \
     xml2 \

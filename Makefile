@@ -68,11 +68,20 @@ MPQ_DATA_DIR = mpqdata
 MPQ_DATA_ARTIFACTS = $(ARTIFACTS)/$(MPQ_DATA_DIR)
 
 # MPQ game data files use to generate the worldserver map data.
+MPQ_LOCALE = enUS
 MPQ = $(addprefix $(GAME_CLIENT)/Data/, $(addsuffix .MPQ, \
 	common expansion patch-3 patch-2 patch common-2 lichking \
-	enUS/lichking-speech-enUS enUS/expansion-speech-enUS enUS/lichking-locale-enUS \
-	enUS/expansion-locale-enUS enUS/base-enUS enUS/patch-enUS-2 enUS/backup-enUS \
-	enUS/speech-enUS enUS/patch-enUS-3 enUS/patch-enUS enUS/locale-enUS ) )
+	$(MPQ_LOCALE)/lichking-speech-$(MPQ_LOCALE) \
+	$(MPQ_LOCALE)/expansion-speech-$(MPQ_LOCALE) \
+	$(MPQ_LOCALE)/lichking-locale-$(MPQ_LOCALE) \
+	$(MPQ_LOCALE)/expansion-locale-$(MPQ_LOCALE) \
+	$(MPQ_LOCALE)/base-$(MPQ_LOCALE) \
+	$(MPQ_LOCALE)/patch-$(MPQ_LOCALE)-2 \
+	$(MPQ_LOCALE)/backup-$(MPQ_LOCALE) \
+	$(MPQ_LOCALE)/speech-$(MPQ_LOCALE) \
+	$(MPQ_LOCALE)/patch-$(MPQ_LOCALE)-3 \
+	$(MPQ_LOCALE)/patch-$(MPQ_LOCALE) \
+	$(MPQ_LOCALE)/locale-$(MPQ_LOCALE) ) )
 
 # TrinityCore binary and config files.
 TOOLS = mapextractor mmaps_generator vmap4assembler vmap4extractor
