@@ -1,20 +1,9 @@
-mapdata/*
-artifacts/*
-*.deb
-*.rpm
+World_of_Warcraft/
 World_of_Warcraft/*
 World of Warcraft/*
-Data/*
-source/*
-*.7z
-*.sql
-.networks
-docker/authserver/authserver
-docker/worldserver/worldserver
-docker/worldserver/*.sql
-docker/tools/mapextractor
-docker/tools/mmaps_generator
-docker/tools/vmap4assembler
-docker/tools/vmap4extractor
-redpath.sh
-menuconfig/examples/*
+dbc/*
+maps/*
+vmaps/*
+mmaps/*
+cameras/*
+gt/*
