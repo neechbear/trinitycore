@@ -84,11 +84,12 @@ get_tdb_url() {
   # https://github.com/TrinityCore/TrinityCore/releases
   curl -sSL ${GITHUB_USER:+"-u$GITHUB_USER:$GITHUB_PASS"} \
     "${GITHUB_API:-https://api.github.com}/repos/${GITHUB_REPO:-TrinityCore/TrinityCore}/releases" \
-    | jq -r "\"tdb_url=\" + ( [
-                .[] | select(
-                .tag_name | contains( \"$tag\" ) )
+    | jq -r --arg tag "$tag" '[
+                .[]
+                | select( .tag_name | contains( $tag ) )
+                | select( .assets[0].browser_download_url | endswith( ".7z" ) )
                 .assets[] .browser_download_url
-              ] | max )"
+              ] | max'
 }
 
 extract_7z_archives() {
@@ -124,7 +125,7 @@ download_source() {
     fi
   fi
   if [[ -z "${tdb_url:-}" ]] ; then
-    declare $(get_tdb_url "$tdb_tag")
+    tdb_url="$(get_tdb_url "$tdb_tag")"
   fi
 
   log_notice "Fetching $branch ${tdb_tag:+($tdb_tag) }..."

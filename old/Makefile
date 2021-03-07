@@ -164,7 +164,7 @@ mapdata_rpm: $(MAP_DATA_RPM)
 #
 
 # Build TrinityCore server inside a Docker container.
-$(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create/%:
+$(BINARIES) $(DIST_CONF) $(SQL_ARTIFACTS)/create/create_mysql.sql:
 	mkdir -p $(ARTIFACTS) $(SOURCE_DIR)
 	docker build -t "tcbuild" docker/build
 	docker run -it --rm \
@@ -220,7 +220,7 @@ $(CONF): $(DIST_CONF)
 $(SQL_TDB_WORLDSERVER):
 	cp -r $(SQL_ARTIFACTS)/TDB_*/"$(notdir $@)" docker/worldserver
 
-$(SQL_INITDB_ARTIFACTS):
+$(SQL_ARTIFACTS) $(SQL_INITDB_ARTIFACTS) $(SQL_ARTIFACTS)/custom $(SQL_ARTIFACTS)/custom/auth:
 	mkdir -p "$@"
 
 # Modify create_mysql.sql to grant permissions to % instead of just localhost.
@@ -251,14 +251,14 @@ $(SQL_INITDB_ARTIFACTS)/005-aowow-db-structures.sql: $(SQL_INITDB_ARTIFACTS)
 
 # Create custom SQL file for to be imported on first run that inserts a default
 # account username and password will full GM permissions.
-$(SQL_ADD_GM_USER): $(SQL_ARTIFACTS)/custom
+$(SQL_ADD_GM_USER): $(SQL_ARTIFACTS)/custom/auth
 	@printf 'REPLACE INTO account (id,username,sha_pass_hash) VALUES (%s, "%s", SHA1(CONCAT(UPPER("%s"),":",UPPER("%s"))));\n' \
 		"$(DEFAULT_GM_ID)" "$(DEFAULT_GM_USER)" "$(DEFAULT_GM_USER)" "$(DEFAULT_GM_PASSWORD)" > "$@"
 	@echo "REPLACE INTO account_access (id,gmlevel,RealmID) VALUES ($(DEFAULT_GM_ID),3,-1);" >> "$@"
 
 # Create custom SQL file to be imported on first run that updates the IP
 # address of the worldserver to be something other than just localhost.
-$(SQL_FIX_REALMLIST): $(SQL_ARTIFACTS)/custom
+$(SQL_FIX_REALMLIST): $(SQL_ARTIFACTS)/custom/auth
 	printf 'REPLACE INTO realmlist (id,name,address,port) VALUES ("%s","%s","%s","%s");\n' \
 		"$(WORLDSERVER_REALM_ID)" "$(WORLDSERVER_NAME)" \
 		"$(shell hostname -i | egrep -o '[0-9\.]{7,15}')" \
