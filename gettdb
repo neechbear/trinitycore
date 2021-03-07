@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+main() {
+  local url="$(curl -sSL https://api.github.com/repos/TrinityCore/TrinityCore/releases \
+    | jq -r --arg tag TDB335 '[.[]|select(.tag_name|contains($tag))|select(.assets[0].browser_download_url|endswith(".7z")).assets[].browser_download_url]|max')"
+  local file="$(echo "$url" | sed -r -e 's/^.*\///')"
+
+  printf 'Retrieving %s from %s ...\n\n' "$file" "$url"
+
+  curl -LO "$url"
+  if which 7zr >/dev/null && [ -e "$file" ]; then
+    #7zr x -y -osrc/sql -- "$file"
+    7zr x -y -- "$file"
+  fi
+}
+
+main "$@"
+

@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017-2020 Nicola Worthington <nicolaw@tfb.net>
 
-FROM debian:stretch
+FROM debian:10
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
 ENV DEBIAN_FRONTEND noninteractive

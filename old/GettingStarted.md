@@ -1,7 +1,12 @@
 # Getting Started
 
+First watch this video demonstration
+https://www.youtube.com/watch?v=JmzZdexSYaM.
+
 This guide will walk you through setting up a TrinityCore private WoW server for
 Wrath of the Lich King (game client version 3.3.5a).
+
+The default username and password will be: `trinity`.
 
 
 ## Requirements
@@ -10,7 +15,6 @@ You will need a Linux or OS X machine that has the following things installed:
 
   * `make`
   * `git`
-  * `jq`
   * Docker
   * `docker-compose` - Follow instructions at https://docs.docker.com/compose/install/
 
@@ -23,7 +27,7 @@ King (game client version 3.3.5a).
 These required packages can be installed on Debian & Ubuntu by running the
 following from your Linux shell:
 
-    $ sudo apt-get install make git jq
+    $ sudo apt-get install make git
     $ curl -sSL https://get.docker.com/ | sh
 
 
@@ -32,7 +36,7 @@ following from your Linux shell:
 These required packages can be installed on CentOS & RHEL by running the
 following from your Linux shell:
 
-    $ sudo yum install make git jq
+    $ sudo yum install make git
     $ curl -sSL https://get.docker.com/ | sh
 
 
@@ -41,45 +45,31 @@ following from your Linux shell:
 You will need to preform 4 distinct steps in order to start your private
 TrinityCore server, (and start playing on it).
 
-  1. Download _or_ build the TrinityCore container image.
+  1. Compile the TrinityCore server.
 
   2. Generate the map data used by the `worldserver`. This will require a copy
      of the World of Warcraft game client files.
 
-  3. Start the TrinityCore and database containers.
+  3. Start the TrinityCore server.
 
   4. Configure your World of Warcraft game client, then connect to your
      TrinityCore private WoW server.
 
 
-### Downloading Pre-built TrinityCore Container
+### Compiling TrinityCore
 
-From your Linux or macOS shell, run the following:
-
-    $ docker pull nicolaw/trinitycore:3.3.5-sql
-
-You can check how up-to-date the downloaded container image is by running the
-following command:
-
-    $ docker inspect nicolaw/trinitycore:3.3.5-slim | jq -r '.[0].Config.Labels'
-
-If you find that it is too old and that you need a newer version, you can build
-your own version of the container by following the instructions in the next step
-instead.
-
-
-### Building TrinityCore Cotnainer
-
-From your Linux or macOS shell, run the following:
+From your Linux shell, run the following:
 
     $ git clone https://github.com/neechbear/trinitycore
-    $ make build FLAVOUR=sql
+    $ cd trinitycore
+    $ make build
 
 Depending on the performance of your machine, this may take up to 1 hour to
 complete.
 
-The TrinityCore conatiner image `nicolaw/trinitycore:3.3.5-sql` should now be
-built and ready to use.
+The TrinityCore server should now be compiled inside of a Docker container. The
+resulting build artifacts will be placed in to the `./artifacts/` sub-directory
+in your current path.
 
 
 ### Generating Map Data
@@ -119,18 +109,6 @@ To stop the server, press `Control-C`.
 You can now stop and start your TrinityCore server whenever you wish.
 
 
-### Creating Initial GM Administrator Account
-
-    ¯\_(ツ)_/¯
-
-Since the recent `auth.account` table changes moving away from the
-`sha_pass_hash` method, it is unclear how a user can be created through any
-other means than the `worldserver` console. This might mean that there is no
-longer programatic method as both the remote access telnet and SOAP
-interfaces both require authentication, causing a bit of a chicken-and-egg
-scenario.
-
-
 ### Configuring your Game Client
 
 As with any private WoW server, you will need to edit your `realmlist.wtf` file
@@ -147,4 +125,42 @@ https://trinitycore.atlassian.net/wiki/display/tc/GM+Commands for a full list of
 available commands.
 
 Enjoy!
+
+
+## Further Customisation
+
+TODO: Describe the following here (while linking to as many pre-existing
+TrinityCore forum and documentation resources as possible at the same time):
+
+  * Connecting to TC-JSON-RPC on port 8081 (http://yourserver:8081/public/index.php/).
+  * Connecting to Keira2 on port 8082 (http://yourserver:8082/Keira2/).
+  * Inserting custom SQL before first `make run`.
+  * Use of `worldserver` remote console.
+  * Use of `worldserver` SOAP API.
+  * Using `tcadmin`.
+  * Launching the Docker swarm into the background as a daemon.
+  * Changing `authserver.conf` and `worldserver.conf`.
+  * Connecting to the MariaDB database.
+
+
+## See Also
+
+Related works by the same author:
+
+  * https://github.com/neechbear/trinitycore-gce
+  * https://github.com/neechbear/trinitycore
+  * https://hub.docker.com/r/nicolaw/trinitycore
+  * https://github.com/neechbear/tcadmin
+  * https://neech.me.uk
+  * https://nicolaw.uk/#WoW
+
+Related TrinityCore projects and links:
+
+  * https://trinitycore.atlassian.net/wiki/display/tc/GM+Commands
+  * https://trinitycore.atlassian.net/wiki/display/tc/Installation+Guide
+    * https://github.com/TrinityCore/
+      * https://github.com/TrinityCore/TrinityCore
+      * https://github.com/TrinityCore/aowow
+  * https://github.com/Sarjuuk/aowow
+    * https://db.rising-gods.de
 

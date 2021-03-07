@@ -1,0 +1,70 @@
+---
+# MIT License
+# Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
+
+version: "3.4"
+
+volumes:
+  db-data:
+
+services:
+  mysql:
+    container_name: mysql
+    image: "mariadb:latest"
+    environment:
+      MYSQL_ROOT_PASSWORD: trinity
+      MYSQL_USER: trinity
+      MYSQL_PASSWORD: trinity
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      timeout: 20s
+      retries: 10
+      start_period: 20s
+    ports:
+    - "3306:3306"
+    volumes:
+    - db-data:/var/lib/mysql
+    - ./sql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+  authserver:
+    container_name: authserver
+    image: nicolaw/trinitycore:3.3.5-sql
+    command: ["/bin/sh", "-c", "sleep 10; wait-for-it.sh mysql:3306 --timeout=0 --strict --child; authserver"]
+    #command: ["/bin/sh", "-c", "wait-for-it.sh mysql:3306 -t 0 -s -- authserver"]
+    #command: ["/bin/sh", "-c", "sleep 10; authserver"]
+    depends_on:
+    - mysql
+    - worldserver
+    healthcheck:
+      test: ["CMD", "nc", "localhost", "3724"]
+      timeout: 20s
+      retries: 10
+      start_period: 20s
+    ports:
+    - "3724:3724"
+    volumes:
+    - ./authserver.conf:/etc/authserver.conf
+    - ./sql/custom:/src/sql/custom
+
+  worldserver:
+    container_name: worldserver
+    image: nicolaw/trinitycore:3.3.5-sql
+    command: ["/bin/sh", "-c", "sleep 10; wait-for-it.sh mysql:3306 --timeout=0 --strict --child; sleep 5; worldserver"]
+    #command: ["/bin/sh", "-c", "/usr/local/bin/wait-for-it.sh mysql:3306 -t 0 -s -- worldserver"]
+    #command: ["/bin/sh", "-c", "sleep 10; worldserver"]
+    depends_on:
+    - mysql
+    healthcheck:
+      test: ["CMD", "nc", "localhost", "8085"]
+      timeout: 20s
+      retries: 10
+      start_period: 20s
+    ports:
+    - "8085:8085"
+    - "3443:3443"
+    - "7878:7878"
+    volumes:
+    - ./worldserver.conf:/etc/worldserver.conf
+    - ./sql/custom:/src/sql/custom
+    - ./mapdata:/mapdata
+

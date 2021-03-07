@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # MIT License
-# Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
+# Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
 
 set -Euo pipefail
 

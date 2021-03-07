@@ -1,0 +1,21 @@
+CREATE USER IF NOT EXISTS 'trinity'@'%' IDENTIFIED BY 'trinity' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;
+GRANT USAGE ON * . * TO 'trinity'@'%';
+CREATE DATABASE IF NOT EXISTS `world` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE IF NOT EXISTS `characters` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE IF NOT EXISTS `auth` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON `world` . * TO 'trinity'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON `characters` . * TO 'trinity'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON `auth` . * TO 'trinity'@'%' WITH GRANT OPTION;
+
+-- REVOKE ALL PRIVILEGES ON * . * FROM 'trinity'@'%';
+-- REVOKE ALL PRIVILEGES ON `world` . * FROM 'trinity'@'%';
+-- REVOKE GRANT OPTION ON `world` . * FROM 'trinity'@'%';
+-- REVOKE ALL PRIVILEGES ON `characters` . * FROM 'trinity'@'%';
+-- REVOKE GRANT OPTION ON `characters` . * FROM 'trinity'@'%';
+-- REVOKE ALL PRIVILEGES ON `auth` . * FROM 'trinity'@'%';
+-- REVOKE GRANT OPTION ON `auth` . * FROM 'trinity'@'%';
+-- DROP USER IF EXISTS 'trinity'@'%';
+-- DROP DATABASE IF EXISTS `world`;
+-- DROP DATABASE IF EXISTS `characters`;
+-- DROP DATABASE IF EXISTS `auth`;
+
