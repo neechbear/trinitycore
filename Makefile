@@ -7,7 +7,7 @@
 
 .DEFAULT_GOAL := test
 
-NPROCS = $(shell nprocs)
+# TODO: Possibly inject these into the docker build with --build-arg.
 GITHUB_REPO = TrinityCore/TrinityCore
 GITHUB_API = https://api.github.com
 GIT_BRANCH = 3.3.5
@@ -27,6 +27,7 @@ IMAGE_TAG = $(GIT_BRANCH)-slim
 IMAGE_NAME = nicolaw/trinitycore:$(IMAGE_TAG)
 
 image:
+	# TODO: Replace $$PWD with a calculated $(MAKEFILE_DIR).
 	docker build -f Dockerfile $$PWD -t $(IMAGE_NAME) \
 	--build-arg VCS_REF=$(VCS_REF) \
 	--build-arg BUILD_DATE="$(BUILD_DATE)" \

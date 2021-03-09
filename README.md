@@ -23,3 +23,23 @@ This slim container image for TrinityCore 3.3.5 is a work in progress. See
     -rwxr-xr-x    1 root     root      857.5K Mar  9 01:13 vmap4extractor
     -rwxr-xr-x    1 root     root       24.3M Mar  9 01:13 worldserver
 
+## Building
+
+Building the container image is optional as you can simply pull the latest
+`nicolaw/trinitycore:3.3.5-slim` image directly from Docker Hub as illustrated
+above. Alternatively you can compile TrinityCore inside a container to build
+the container image using the `image` target:
+
+    $ make image
+
+Generate the map data from your game client directory in `./World_of_Warcraft`
+using the `mapdata` target:
+
+    $ make mapdata
+
+## Running
+
+Run the database, world server and auth server using `docker-compose`:
+
+    $ docker-compose up
+
