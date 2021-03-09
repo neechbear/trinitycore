@@ -1,6 +1,8 @@
 # MIT License
 # Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
 
+# TODO: Add a convenient menuconfig diaglog target?
+
 .PHONY: test build image
 
 .DEFAULT_GOAL := test
@@ -25,6 +27,7 @@ image:
 test:
 	docker run --rm -it $(IMAGE_NAME)
 
+# TODO: Remove. (Unused). See Dockerfile multistage build instead.
 build:
 	git clone --branch $(GIT_BRANCH) --single-branch $(GIT_REPO) /src
 	mkdir -pv /src/build
@@ -33,7 +36,7 @@ build:
 	make -j$(NPROC)
 	make install
 
-#  # Turn on --debug preset cmake arguments.
+# TODO: Add debug options to Dockerfile multistage build debug tag flavour.
 #  if [[ "${cmdarg_cfg[debug]}" == true ]]; then
 #    # https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
 #    # https://trinitycore.atlassian.net/wiki/display/tc/Linux+Core+Installation

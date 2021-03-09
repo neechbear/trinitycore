@@ -21,6 +21,9 @@
 #       archive files.
 #
 # TODO: Include a help command to extract all the height maps.
+#
+# TODO: CloudFormation template to deploy into AWS EC2, with or without RDS.
+#       Requires client MPQ resources to be uploaded to S3 bucket.
 
 FROM debian:buster-slim AS build
 
@@ -66,12 +69,14 @@ RUN ldd /artifacts/opt/trinitycore/bin/* /usr/bin/mysql | grep ' => ' | tr -s '[
     xargs -I % sh -c 'mkdir -pv $(dirname /artifacts%); cp -v % /artifacts%'
 
 WORKDIR /artifacts
+# TODO: Optionally don't strip for debug builds.
 RUN strip opt/trinitycore/bin/*
 RUN mv -v etc/authserver.conf.dist etc/authserver.conf
 RUN mv -v etc/worldserver.conf.dist etc/worldserver.conf
 
 
 FROM busybox:stable-glibc AS slim
+# TODO: Add labels https://medium.com/@chamilad/lets-make-your-docker-image-better-than-90-of-existing-ones-8b1e5de950d.
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 ENV LD_LIBRARY_PATH=/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu PATH=/bin:/usr/bin:/opt/trinitycore/bin
 COPY --from=build /artifacts /
