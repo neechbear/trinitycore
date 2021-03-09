@@ -1,3 +1,12 @@
+# IMPORTANT NOTE
+
+The `master` branch is currently overly complex and broken in a number of subtle
+ways as it has not been maintained for the last couple of years. Please see the
+`2021rewrite` branch in the short term until this rewrite has been completed.
+
+https://github.com/NeechBear/trinitycore/tree/2021rewrite
+
+
 # Dockerised TrinityCore
 
 See [GettingStarted.md](GettingStarted.md) for a guide on how to run TrinityCore
