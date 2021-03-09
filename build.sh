@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # MIT License
-# Copyright (c) 2017 Nicola Worthington <nicolaw@tfb.net>
+# Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
 
 set -Eauo pipefail
 shopt -s extdebug
@@ -50,10 +50,10 @@ is_directory() {
 
 _parse_command_line_arguments () {
   cmdarg_info "header" "TrinityCore Dockerised build wrapper."
-  cmdarg_info "version" "1.0"
+  cmdarg_info "version" "1.1"
 
   cmdarg_info "author" "Nicola Worthington <nicolaw@tfb.net>."
-  cmdarg_info "copyright" "(C) 2017 Nicola Worthington."
+  cmdarg_info "copyright" "(C) 2017-2021 Nicola Worthington."
 
   cmdarg_info "footer" \
     "See https://github.com/neechbear/trinitycore, https://neech.me.uk," \
@@ -117,40 +117,39 @@ download_source() {
   declare tdb_url="${4:-}"
 
   # Determine what TDB database archive URL to download.
-  if ! url_exists "$tdb_url"; then
-    if [[ "$tdb_url" =~ "TDB"* ]]; then
-      tdb_tag="$tdb_url"
-    else
-      tdb_tag="${branch//[^0-9]/}"
-    fi
-  fi
-  if [[ -z "${tdb_url:-}" ]] ; then
-    tdb_url="$(get_tdb_url "$tdb_tag")"
-  fi
-
-  log_notice "Fetching $branch ${tdb_tag:+($tdb_tag) }..."
-  log_info " -> $repo_url ($branch branch)"
-  log_info " -> $tdb_url"
+  #if ! url_exists "$tdb_url"; then
+  #  if [[ "$tdb_url" =~ "TDB"* ]]; then
+  #    tdb_tag="$tdb_url"
+  #  else
+  #    tdb_tag="${branch//[^0-9]/}"
+  #  fi
+  #fi
+  #if [[ -z "${tdb_url:-}" ]] ; then
+  #  tdb_url="$(get_tdb_url "$tdb_tag")"
+  #fi
+  #
+  #log_notice "Fetching $branch ${tdb_tag:+($tdb_tag) }..."
+  #log_info " -> $repo_url ($branch branch)"
+  #log_info " -> $tdb_url"
 
   declare repo_dir="$target/TrinityCore"
   # https://github.com/TrinityCore/TrinityCore/blob/master/cmake/genrev.cmake
   # https://git-scm.com/docs/git-describe
-  if [[ ! -e "$repo_dir" ]]; then
-      #--shallow-since="$(date +%F -d "6 months ago")" \
+  #if [[ ! -e "$repo_dir" ]]; then
     git clone \
       --branch "$branch" --single-branch \
       ${cmdarg_cfg[reference]:+--reference "${cmdarg_cfg[reference]}"} \
       "$repo_url" "$repo_dir"
-  else
-    git -C "$repo_dir" pull
-  fi
+  #else
+  #  git -C "$repo_dir" pull
+  #fi
 
-  if [[ ! -s "$repo_dir/sql/${tdb_url##*/}" ]]; then
-    mkdir -p "$repo_dir/sql"
-    echo "Downloading database $tdb_url ..."
-    curl -L --progress-bar -o "$repo_dir/sql/${tdb_url##*/}" "$tdb_url"
-    extract_7z_archives "$repo_dir/sql"
-  fi
+  #if [[ ! -s "$repo_dir/sql/${tdb_url##*/}" ]]; then
+  #  mkdir -p "$repo_dir/sql"
+  #  echo "Downloading database $tdb_url ..."
+  #  curl -L --progress-bar -o "$repo_dir/sql/${tdb_url##*/}" "$tdb_url"
+  #  extract_7z_archives "$repo_dir/sql"
+  #fi
 }
 
 define_args() {
@@ -161,7 +160,7 @@ define_args() {
 }
 
 build() {
-  mkdir -p "${cmdarg_cfg[source]%/}/TrinityCore/build"
+  mkdir -p "${cmdarg_cfg[source]%/}/TrinityCore/build" "${cmdarg_cfg[output]%/}"
   pushd "${cmdarg_cfg[source]%/}/TrinityCore/build"
 
   # Turn on --debug preset cmake arguments.
@@ -215,10 +214,14 @@ build() {
 main() {
   # Parse command line options.
   declare -gA cmdarg_cfg=()
+  # https://github.com/TrinityCore/TrinityCore/blob/1d04d5859a59caf286d71f78a18ec4ed05feb7c2/doc/UnixInstall.txt
   declare -gA define=(
       [TOOLS]=1
       [WITH_WARNINGS]=0
-      [CMAKE_INSTALL_PREFIX]=/opt/trinitycore
+      [CMAKE_INSTALL_PREFIX]="/"
+      [CONF_DIR]="/etc"
+      #[LIBSDIR]="/usr/lib/trinitycore"
+      [CMAKE_INSTALL_DO_STRIP]=1
     )
   _parse_command_line_arguments "$@" || exit $?
 
@@ -238,24 +241,73 @@ main() {
   download_source "${cmdarg_cfg[source]}" \
     "${cmdarg_cfg[branch]}" "${cmdarg_cfg[repo]}" "${cmdarg_cfg[tdb]}"
 
+  find / -xdev -type f \
+    -and -not -path "/artifacts/*" \
+    -and -not -path "/usr/local/src/*" \
+    -and -not -path "/var/*" > /var/files.before
+
   # Build TrinityCore.
   build
 
+  find / -xdev -type f \
+    -and -not -path "/artifacts/*" \
+    -and -not -path "/usr/local/src/*" \
+    -and -not -path "/var/*" > /var/files.after
+
+  mkdir -pv /artifacts/
+  comm -1 -3 /var/files.before /var/files.after \
+    | tar -cvf - -T - \
+    | tar -C /artifacts/ -xvf -
+
+  #find / -xdev -type f -mmin -5 \
+  #  -and -not -path "/artifacts/*" \
+  #  -and -not -path "/usr/local/src/*" \
+  #  -and -not -path "/var/*" 2>/dev/null \
+  #  | tar -cvf - -T - \
+  #  | tar -C /artifacts/ -xvf -
+
+  (
+    set -x
+    set +e
+    for conf in /artifacts/etc/*.conf.dist
+    do
+      mv -v "$conf" "${conf%.dist}" || true
+    done
+  ) || true
+
+  set -e
+
+  ldd /artifacts/bin/* | grep ' => ' | tr -s '[:blank:]' '\n' | grep '^/' | sort -u | \
+    xargs -I % sh -c 'mkdir -pv $(dirname /artifacts%); cp -v % /artifacts%;'
+
+  find /artifacts/ -ls
+
   # Copy build artifacts to output directory.
-  cp -r "${define[CMAKE_INSTALL_PREFIX]%/}"/* "${cmdarg_cfg[output]%/}"/
+  #for src in "${define[CONF_DIR]%/}" "${define[LIBSDIR]%/}" "${define[CMAKE_INSTALL_PREFIX]%/}"
+  #do
+  #  if [[ -e "$src" ]] ; then
+  #    mkdir -pv "${cmdarg_cfg[output]%/}/${src#/}"
+  #    rsync -av "$src" "${cmdarg_cfg[output]%/}/${src#/}"
+  #  fi
+  #done
+
+  #cp -r "${define[CONF_DIR]%/}"/* "${cmdarg_cfg[output]%/}"/
+  #cp -r "${define[LIBSDIR]%/}"/* "${cmdarg_cfg[output]%/}"/
+  #cp -r "${define[CMAKE_INSTALL_PREFIX]%/}"/* "${cmdarg_cfg[output]%/}"/
 
   # Copy SQL artifacts to output directory.
-  mkdir -p "${cmdarg_cfg[output]%/}/sql"
-  cp -r "${cmdarg_cfg[source]%/}/TrinityCore/sql/"* "${cmdarg_cfg[output]%/}/sql/"
+  #mkdir -p "${cmdarg_cfg[output]%/}/sql"
+  #cp -r "${cmdarg_cfg[source]%/}/TrinityCore/sql/"* "${cmdarg_cfg[output]%/}/sql/"
+  #find "${cmdarg_cfg[output]%/}/sql/" -name '*.7z' -print -delete
 
   # Save Git revision.
-  git -C "${cmdarg_cfg[source]%/}/TrinityCore" rev-parse HEAD > "${cmdarg_cfg[output]%/}/git-rev"
-  git -C "${cmdarg_cfg[source]%/}/TrinityCore" rev-parse --short HEAD > "${cmdarg_cfg[output]%/}/git-rev-short"
+  #git -C "${cmdarg_cfg[source]%/}/TrinityCore" rev-parse HEAD > "${cmdarg_cfg[output]%/}/git-rev"
+  #git -C "${cmdarg_cfg[source]%/}/TrinityCore" rev-parse --short HEAD > "${cmdarg_cfg[output]%/}/git-rev-short"
 
   # "This should be OK for us."
   # https://nicolaw.uk/this_should_be_OK_for_us
-  find "${cmdarg_cfg[output]}" -type d -exec chmod a+x '{}' \;
-  chmod -R a+rw "${cmdarg_cfg[output]%/}/"*
+  #find "${cmdarg_cfg[output]}" -type d -exec chmod a+x '{}' \;
+  #chmod -R a+rw "${cmdarg_cfg[output]%/}/"*
 }
 
 main "$@"
