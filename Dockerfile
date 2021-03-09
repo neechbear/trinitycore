@@ -55,16 +55,36 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update \
  && update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 \
  && update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang 100
 
-RUN git clone --branch 3.3.5 --single-branch https://github.com/TrinityCore/TrinityCore.git /src
+# TODO: Perhaps get these values from build args (with 3.3.5 sensible defaults)?
+RUN git clone --branch 3.3.5 --single-branch --depth 1 https://github.com/TrinityCore/TrinityCore.git /src
+
+# TODO: Add debug options to Dockerfile multistage build debug tag flavour.
+#  if [[ "${cmdarg_cfg[debug]}" == true ]]; then
+#    # https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
+#    # https://trinitycore.atlassian.net/wiki/display/tc/Linux+Core+Installation
+#    define[WITH_WARNINGS]=1
+#    define[WITH_COREDEBUG]=0 # What does this do, and why is it 0 on a debug build?
+#    define[CMAKE_BUILD_TYPE]="Debug"
+#    define[CMAKE_C_FLAGS]="-Werror"
+#    define[CMAKE_CXX_FLAGS]="-Werror"
+#    define[CMAKE_C_FLAGS_DEBUG]="-DNDEBUG"
+#    define[CMAKE_CXX_FLAGS_DEBUG]="-DNDEBUG"
+#  fi
+#  if [[ "${define[WITH_WARNINGS]}" == "0" ]]; then
+#    extra_cmake_args+=("-Wno-dev")
+#  fi
 
 RUN mkdir -pv /build/
 WORKDIR /build
 # TODO: See https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml for debug builds.
+# TODO: Perhaps get some of these values (or augment them) from build args?
 RUN cmake ../src -DTOOLS=1 -DWITH_WARNINGS=0 -DCMAKE_INSTALL_PREFIX=/opt/trinitycore -DCONF_DIR=/etc -Wno-dev
 RUN make -j$(nproc)
 RUN make install
 
-RUN mkdir -pv /artifacts/ && tar -cf - /usr/bin/mysql /opt/trinitycore /etc/*server.conf.dist | tar -C /artifacts/ -xvf -
+RUN find /build -ls
+
+RUN mkdir -pv /artifacts/ && tar -cf - --exclude=**/sql/old/** /usr/bin/mysql /opt/trinitycore /src/sql /etc/*server.conf.dist | tar -C /artifacts/ -xvf -
 RUN ldd /artifacts/opt/trinitycore/bin/* /usr/bin/mysql | grep ' => ' | tr -s '[:blank:]' '\n' | grep '^/' | sort -u | \
     xargs -I % sh -c 'mkdir -pv $(dirname /artifacts%); cp -v % /artifacts%'
 
@@ -92,8 +112,12 @@ LABEL org.label-schema.vcs-url="https://github.com/NeechBear/trinitycore"
 LABEL org.label-schema.vcs-ref=$VCS_REF
 LABEL org.label-schema.vendor="Nicola Worthington"
 LABEL org.label-schema.version=$BUILD_VERSION
-LABEL org.label-schema.docker.cmd="docker run --rm -p 8085:8085 -p 3443:3443 -p 7878:7878 -d nicolaw/trinitycore:3.3.5-slim worldserver"
-LABEL org.label-schema.docker.cmd.authserver="docker run --rm -p 3724:3724 -d nicolaw/trinitycore:3.3.5-slim authserver"
+LABEL org.label-schema.docker.cmd.worldserver="docker run --rm -p 8085:8085 -p 3443:3443 -p 7878:7878 -v \$PWD/worldserver.conf:/etc/worldserver.conf -d nicolaw/trinitycore:3.3.5-slim worldserver"
+LABEL org.label-schema.docker.cmd.authserver="docker run --rm -p 3724:3724 -v \$PWD/authserver.conf:/etc/authserver.conf -d nicolaw/trinitycore:3.3.5-slim authserver"
+LABEL org.label-schema.docker.cmd.mapextractor="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-slim mapextractor -i /wow -o /mapdata -e 7 -f 0"
+LABEL org.label-schema.docker.cmd.vmap4extractor="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-slim vmap4extractor -l -d /wow/Data"
+LABEL org.label-schema.docker.cmd.vmap4assembler="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-slim vmap4assembler /mapdata/Buildings /mapdata/vmaps"
+LABEL org.label-schema.docker.cmd.mmaps_generator="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-slim mmaps_generator"
 
 ENV LD_LIBRARY_PATH=/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu PATH=/bin:/usr/bin:/opt/trinitycore/bin
 COPY --from=build /artifacts /

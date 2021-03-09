@@ -1,0 +1,47 @@
+---
+# MIT License
+# Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
+
+# https://docs.docker.com/compose/compose-file
+
+version: "3.8"
+services:
+  mysql:
+    image: "mariadb:latest"
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-okgreat}"
+      MYSQL_USER: "${DB_USERNAME:-trinity}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-trinity}"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      timeout: "20s"
+      retries: 10
+    ports:
+    - "3307:3306"
+    volumes:
+    - db-data:/var/lib/mysql
+    - sql:/docker-entrypoint-initdb.d
+  authserver:
+    image: nicolaw/trinitycore:3.3.5-slim
+    depends_on:
+    - mysql
+    links:
+    - mysql:mysql
+    ports:
+    - "3724:3724"
+    volumes:
+    - authserver.conf:/etc/authserver.conf
+  worldserver:
+    image: nicolaw/trinitycore:3.3.5-slim
+    depends_on:
+    - mysql
+    links:
+    - mysql:mysql
+    ports:
+    - "8085:8085"
+    - "3443:3443"
+    - "7878:7878"
+    volumes:
+    - worldserver.conf:/etc/worldserver.conf
+    - mapdata:/mapdata
+    - sql/TDB_world_full.sql:/src/sql/TDB_world_full.sql

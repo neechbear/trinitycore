@@ -3,7 +3,7 @@
 
 # TODO: Add a convenient menuconfig diaglog target?
 
-.PHONY: test build image
+.PHONY: test build image mapdata
 
 .DEFAULT_GOAL := test
 
@@ -18,6 +18,7 @@ BUILD_DATE = $(shell date --rfc-3339=seconds)
 BUILD_VERSION = $(shell cat VERSION)
 
 # https://github.com/TrinityCore/TrinityCore/releases
+# TODO: Pull down the full TDB SQL dump into ./sql/
 TDB_FULL_URL = $(shell curl \
 	-sSL $${GITHUB_USER:+"-u$$GITHUB_USER:$$GITHUB_PASS"} "$(GITHUB_API)/repos/$(GITHUB_REPO)/releases" \
 	| jq -r --arg tag "$$tag" '[.[]|select(.tag_name|contains($$tag))|select(.assets[0].browser_download_url|endswith(".7z")).assets[].browser_download_url]|max')
@@ -35,29 +36,10 @@ image:
 test:
 	docker run --rm -it $(IMAGE_NAME)
 
-# TODO: Remove. (Unused). See Dockerfile multistage build instead.
-build:
-	git clone --branch $(GIT_BRANCH) --single-branch $(GIT_REPO) /src
-	mkdir -pv /src/build
-	cd /src/build
-	cmake ../ -DTOOLS=1 -DWITH_WARNINGS=0 -DCMAKE_INSTALL_PREFIX=/opt/trinitycore -DCONF_DIR=/etc -Wno-dev
-	make -j$(NPROC)
-	make install
+mapdata: World_of_Warcraft
+	mkdir -pv mapdata
+	eval $$(docker inspect $(IMAGE_NAME) | jq -r '.[0].Config.Labels."org.label-schema.docker.cmd.mapextractor"')
+	eval $$(docker inspect $(IMAGE_NAME) | jq -r '.[0].Config.Labels."org.label-schema.docker.cmd.vmap4extractor"')
+	eval $$(docker inspect $(IMAGE_NAME) | jq -r '.[0].Config.Labels."org.label-schema.docker.cmd.vmap4assembler"')
+	eval $$(docker inspect $(IMAGE_NAME) | jq -r '.[0].Config.Labels."org.label-schema.docker.cmd.mmaps_generator"')
 
-# TODO: Add debug options to Dockerfile multistage build debug tag flavour.
-#  if [[ "${cmdarg_cfg[debug]}" == true ]]; then
-#    # https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
-#    # https://trinitycore.atlassian.net/wiki/display/tc/Linux+Core+Installation
-#    define[WITH_WARNINGS]=1
-#    define[WITH_COREDEBUG]=0 # What does this do, and why is it 0 on a debug build?
-#    define[CMAKE_BUILD_TYPE]="Debug"
-#    define[CMAKE_C_FLAGS]="-Werror"
-#    define[CMAKE_CXX_FLAGS]="-Werror"
-#    define[CMAKE_C_FLAGS_DEBUG]="-DNDEBUG"
-#    define[CMAKE_CXX_FLAGS_DEBUG]="-DNDEBUG"
-#  fi
-#
-#  declare -a extra_cmake_args=()
-#  if [[ "${define[WITH_WARNINGS]}" == "0" ]]; then
-#    extra_cmake_args+=("-Wno-dev")
-#  fi
