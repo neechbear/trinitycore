@@ -4,9 +4,14 @@
 
 # https://docs.docker.com/compose/compose-file
 
-version: "3.8"
+version: "3"
+
+volumes:
+  db-data:
+
 services:
   mysql:
+    container_name: "mysql"
     image: "mariadb:latest"
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-okgreat}"
@@ -20,9 +25,12 @@ services:
     - "3307:3306"
     volumes:
     - db-data:/var/lib/mysql
-    - sql:/docker-entrypoint-initdb.d
+    - ./sql:/docker-entrypoint-initdb.d
+
   authserver:
+    container_name: "authserver"
     image: nicolaw/trinitycore:3.3.5-slim
+    command: authserver
     depends_on:
     - mysql
     links:
@@ -30,9 +38,12 @@ services:
     ports:
     - "3724:3724"
     volumes:
-    - authserver.conf:/etc/authserver.conf
+    - ./authserver.conf:/etc/authserver.conf
+
   worldserver:
+    container_name: "worldserver"
     image: nicolaw/trinitycore:3.3.5-slim
+    command: worldserver
     depends_on:
     - mysql
     links:
@@ -42,6 +53,6 @@ services:
     - "3443:3443"
     - "7878:7878"
     volumes:
-    - worldserver.conf:/etc/worldserver.conf
-    - mapdata:/mapdata
-    - sql/TDB_world_full.sql:/src/sql/TDB_world_full.sql
+    - ./worldserver.conf:/etc/worldserver.conf
+    - ./mapdata:/mapdata
+    - ./sql/TDB_world_full.sql:/src/sql/TDB_world_full.sql
