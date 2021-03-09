@@ -1,7 +1,7 @@
 # TrinityCore
 
-* [Docker Hub image](https://hub.docker.com/r/nicolaw/trinitycore/)
-* [GitHub repository](https://github.com/NeechBear/trinitycore/tree/2021rewrite)
+* [Docker Hub container image](https://hub.docker.com/r/nicolaw/trinitycore/)
+* [GitHub source repository](https://github.com/NeechBear/trinitycore/tree/2021rewrite)
 * [Dockerfile](https://raw.githubusercontent.com/neechbear/trinitycore/2021rewrite/Dockerfile)
 * [docker-compose.yaml](https://raw.githubusercontent.com/neechbear/trinitycore/2021rewrite/docker-compose.yaml)
 
