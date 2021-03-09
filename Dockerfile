@@ -76,8 +76,25 @@ RUN mv -v etc/worldserver.conf.dist etc/worldserver.conf
 
 
 FROM busybox:stable-glibc AS slim
-# TODO: Add labels https://medium.com/@chamilad/lets-make-your-docker-image-better-than-90-of-existing-ones-8b1e5de950d.
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
+
+ARG BUILD_DATE
+ARG VCS_REF
+ARG BUILD_VERSION
+
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.build-date=$BUILD_DATE
+LABEL org.label-schema.name="nicolaw/trinitycore"
+LABEL org.label-schema.description="TrinityCore MMO Framework"
+LABEL org.label-schema.usage="https://github.com/neechbear/trinitycore/blob/master/README.md"
+LABEL org.label-schema.url="https://nicolaw.uk/trinitycore/"
+LABEL org.label-schema.vcs-url="https://github.com/NeechBear/trinitycore"
+LABEL org.label-schema.vcs-ref=$VCS_REF
+LABEL org.label-schema.vendor="Nicola Worthington"
+LABEL org.label-schema.version=$BUILD_VERSION
+LABEL org.label-schema.docker.cmd="docker run --rm -p 8085:8085 -p 3443:3443 -p 7878:7878 -d nicolaw/trinitycore:3.3.5-slim worldserver"
+LABEL org.label-schema.docker.cmd.authserver="docker run --rm -p 3724:3724 -d nicolaw/trinitycore:3.3.5-slim authserver"
+
 ENV LD_LIBRARY_PATH=/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu PATH=/bin:/usr/bin:/opt/trinitycore/bin
 COPY --from=build /artifacts /
 

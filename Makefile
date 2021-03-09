@@ -13,16 +13,24 @@ GITHUB_API = https://api.github.com
 GIT_BRANCH = 3.3.5
 GIT_REPO = https://github.com/$(GITHUB_REPO).git
 
+VCS_REF = $(shell git rev-parse HEAD)
+BUILD_DATE = $(shell date --rfc-3339=seconds)
+BUILD_VERSION = $(shell cat VERSION)
+
 # https://github.com/TrinityCore/TrinityCore/releases
 TDB_FULL_URL = $(shell curl \
 	-sSL $${GITHUB_USER:+"-u$$GITHUB_USER:$$GITHUB_PASS"} "$(GITHUB_API)/repos/$(GITHUB_REPO)/releases" \
 	| jq -r --arg tag "$$tag" '[.[]|select(.tag_name|contains($$tag))|select(.assets[0].browser_download_url|endswith(".7z")).assets[].browser_download_url]|max')
 
-IMAGE_TAG = latest
-IMAGE_NAME = tc:$(IMAGE_TAG)
+IMAGE_TAG = $(GIT_BRANCH)-slim
+IMAGE_NAME = nicolaw/trinitycore:$(IMAGE_TAG)
 
 image:
-	docker build -f Dockerfile $$PWD -t $(IMAGE_NAME)
+	docker build -f Dockerfile $$PWD -t $(IMAGE_NAME) \
+	--build-arg VCS_REF=$(VCS_REF) \
+	--build-arg BUILD_DATE="$(BUILD_DATE)" \
+	--build-arg BUILD_VERSION=$(BUILD_VERSION)
+	docker inspect $(IMAGE_NAME) | jq -r '.[0].Config.Labels'
 
 test:
 	docker run --rm -it $(IMAGE_NAME)
