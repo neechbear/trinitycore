@@ -1,6 +1,27 @@
 # MIT License
 # Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
 
+# TODO: Different image tag flavours:
+#   debug <- unstripped, extra debug with source (perhaps with SQL?)
+#   full <- stripped with source
+#   slim <- default (latest aliases slim)
+#
+# TODO: Patch default /etc/{auth,world}server.conf to not write log files and
+#       have other sensible defaults that might work out of the box with an
+#       example docker-compose.yaml that could bring up all the servers and a
+#       MySQL server.
+#
+# TODO: Add more helpful labels that include vcs-url and suggested Docker
+#       command line run examples.
+#
+# TODO: Setup automatic CI pipeline to make a nightly build and publish to
+#       DockerHub.
+#
+# TODO: Include helper command to pull and extract the latest TDB_full SQL
+#       archive files.
+#
+# TODO: Include a help command to extract all the height maps.
+
 FROM debian:buster-slim AS build
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -10,6 +31,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -qq -o Dpkg::Use-Pty=0 update \
  && apt-get -qq -o Dpkg::Use-Pty=0 install --no-install-recommends -y \
     binutils \
+    ca-certificates \
     clang \
     cmake \
     default-mysql-client \
