@@ -56,6 +56,7 @@ RUN git clone --branch 3.3.5 --single-branch https://github.com/TrinityCore/Trin
 
 RUN mkdir -pv /build/
 WORKDIR /build
+# TODO: See https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml for debug builds.
 RUN cmake ../src -DTOOLS=1 -DWITH_WARNINGS=0 -DCMAKE_INSTALL_PREFIX=/opt/trinitycore -DCONF_DIR=/etc -Wno-dev
 RUN make -j$(nproc)
 RUN make install
@@ -72,6 +73,6 @@ RUN mv -v etc/worldserver.conf.dist etc/worldserver.conf
 
 FROM busybox:stable-glibc AS slim
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
-ENV LD_LIBRARY_PATH=/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu PATH=/bin:/opt/trinitycore/bin
+ENV LD_LIBRARY_PATH=/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu PATH=/bin:/usr/bin:/opt/trinitycore/bin
 COPY --from=build /artifacts /
 
