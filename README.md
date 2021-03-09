@@ -1,9 +1,9 @@
 # TrinityCore
 
-* (Docker Hub image)[https://hub.docker.com/r/nicolaw/trinitycore/]
-* (GitHub repository)[https://github.com/NeechBear/trinitycore/tree/2021rewrite]
-* (Dockerfile)[https://raw.githubusercontent.com/neechbear/trinitycore/2021rewrite/Dockerfile]
-* (docker-compose.yaml)[https://raw.githubusercontent.com/neechbear/trinitycore/2021rewrite/docker-compose.yaml]
+* [Docker Hub image](https://hub.docker.com/r/nicolaw/trinitycore/)
+* [GitHub repository](https://github.com/NeechBear/trinitycore/tree/2021rewrite)
+* [Dockerfile](https://raw.githubusercontent.com/neechbear/trinitycore/2021rewrite/Dockerfile)
+* [docker-compose.yaml](https://raw.githubusercontent.com/neechbear/trinitycore/2021rewrite/docker-compose.yaml)
 
 This slim container image for TrinityCore 3.3.5 is a work in progress. See the
 `Dockerfile` and `Makefile` in the GitHub source repository for a list of to-do
