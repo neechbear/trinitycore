@@ -1,0 +1,2 @@
+--REPLACE INTO account (id,username,sha_pass_hash) VALUES (1, "admin", SHA1(CONCAT(UPPER("admin"),":",UPPER("password"))));
+--REPLACE INTO account_access (id,gmlevel,RealmID) VALUES (1,3,-1);

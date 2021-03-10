@@ -3,9 +3,11 @@
 
 # TODO: Add a convenient menuconfig diaglog target?
 
-.PHONY: test build image mapdata
+.PHONY: test build image mapdata veryclean clean server
 
 .DEFAULT_GOAL := test
+
+FLAVOUR=slim
 
 # TODO: Possibly inject these into the docker build with --build-arg.
 GITHUB_REPO = TrinityCore/TrinityCore
@@ -23,12 +25,24 @@ TDB_FULL_URL = $(shell curl \
 	-sSL $${GITHUB_USER:+"-u$$GITHUB_USER:$$GITHUB_PASS"} "$(GITHUB_API)/repos/$(GITHUB_REPO)/releases" \
 	| jq -r --arg tag "$$tag" '[.[]|select(.tag_name|contains($$tag))|select(.assets[0].browser_download_url|endswith(".7z")).assets[].browser_download_url]|max')
 
-IMAGE_TAG = $(GIT_BRANCH)-slim
+IMAGE_TAG = $(GIT_BRANCH)-$(FLAVOUR)
 IMAGE_NAME = nicolaw/trinitycore:$(IMAGE_TAG)
+
+clean:
+	true
+
+server:
+	docker-compose up
+
+veryclean:
+	docker-compose down || true
+	docker-compose rm -sfv || true
+	docker volume rm trinitycore_db-data || true
 
 image:
 	# TODO: Replace $$PWD with a calculated $(MAKEFILE_DIR).
 	docker build -f Dockerfile $$PWD -t $(IMAGE_NAME) \
+	--build-arg FLAVOUR=$(FLAVOUR) \
 	--build-arg VCS_REF=$(VCS_REF) \
 	--build-arg BUILD_DATE="$(BUILD_DATE)" \
 	--build-arg BUILD_VERSION=$(BUILD_VERSION)

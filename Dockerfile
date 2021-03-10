@@ -1,29 +1,10 @@
 # MIT License
 # Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
 
-# TODO: Different image tag flavours:
-#   debug <- unstripped, extra debug with source (perhaps with SQL?)
-#   full <- stripped with source
-#   slim <- default (latest aliases slim)
-#
-# TODO: Patch default /etc/{auth,world}server.conf to not write log files and
-#       have other sensible defaults that might work out of the box with an
-#       example docker-compose.yaml that could bring up all the servers and a
-#       MySQL server.
-#
-# TODO: Add more helpful labels that include vcs-url and suggested Docker
-#       command line run examples.
-#
 # TODO: Setup automatic CI pipeline to make a nightly build and publish to
 #       DockerHub.
-#
-# TODO: Include helper command to pull and extract the latest TDB_full SQL
-#       archive files.
-#
-# TODO: Include a help command to extract all the height maps.
-#
-# TODO: CloudFormation template to deploy into AWS EC2, with or without RDS.
-#       Requires client MPQ resources to be uploaded to S3 bucket.
+
+ARG FLAVOUR=slim
 
 FROM debian:buster-slim AS build
 
@@ -33,15 +14,18 @@ ENV DEBIAN_FRONTEND noninteractive
 # https://trinitycore.atlassian.net/wiki/display/tc/Requirements
 RUN apt-get -qq -o Dpkg::Use-Pty=0 update \
  && apt-get -qq -o Dpkg::Use-Pty=0 install --no-install-recommends -y \
+    p7zip \
     binutils \
     ca-certificates \
     clang \
     cmake \
+    curl \
     default-mysql-client \
     default-libmysqlclient-dev \
     g++ \
     gcc \
     git \
+    jq \
     make \
     libboost-all-dev \
     libssl-dev \
@@ -74,7 +58,7 @@ RUN git clone --branch 3.3.5 --single-branch --depth 1 https://github.com/Trinit
 #    extra_cmake_args+=("-Wno-dev")
 #  fi
 
-RUN mkdir -pv /build/
+RUN mkdir -pv /build/ /artifacts/
 WORKDIR /build
 # TODO: See https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml for debug builds.
 # TODO: Perhaps get some of these values (or augment them) from build args?
@@ -82,22 +66,37 @@ RUN cmake ../src -DTOOLS=1 -DWITH_WARNINGS=0 -DCMAKE_INSTALL_PREFIX=/opt/trinity
 RUN make -j$(nproc)
 RUN make install
 
-RUN find /build -ls
+ADD https://raw.githubusercontent.com/bells17/wait-for-it-for-busybox/master/wait-for-it.sh /bin/wait-for-it.sh
+RUN chmod +x /bin/wait-for-it.sh
 
-RUN mkdir -pv /artifacts/ && tar -cf - --exclude=**/sql/old/** /usr/bin/mysql /opt/trinitycore /src/sql /etc/*server.conf.dist | tar -C /artifacts/ -xvf -
-RUN ldd /artifacts/opt/trinitycore/bin/* /usr/bin/mysql | grep ' => ' | tr -s '[:blank:]' '\n' | grep '^/' | sort -u | \
-    xargs -I % sh -c 'mkdir -pv $(dirname /artifacts%); cp -v % /artifacts%'
+ARG FLAVOUR=slim
+ENV FLAVOUR=${FLAVOUR}
 
 WORKDIR /artifacts
-# TODO: Optionally don't strip for debug builds.
+
+RUN tar -cf - /usr/bin/mysql /opt/trinitycore /etc/*server.conf.dist | tar -C /artifacts/ -xvf - \
+ && if [ "x$FLAVOUR" = "xsql" ] || [ "x$FLAVOUR" = "xfull" ] ; then tar -cf - /src/sql | tar -C /artifacts/ -xvf - ; fi \
+ && if [ "x$FLAVOUR" = "xfull" ] ; then tar -cf - --exclude=**build/dep/** --exclude=**build/src/** /src /build /usr/bin/curl /usr/bin/cmake | tar -C /artifacts/ -xvf - ; fi
+RUN ldd opt/trinitycore/bin/* usr/bin/* | grep ' => ' | tr -s '[:blank:]' '\n' | grep '^/' | sort -u | \
+    xargs -I % sh -c 'mkdir -pv $(dirname .%); cp -v % .%'
 RUN strip opt/trinitycore/bin/*
-RUN mv -v etc/authserver.conf.dist etc/authserver.conf
-RUN mv -v etc/worldserver.conf.dist etc/worldserver.conf
+#RUN mv -v etc/authserver.conf.dist etc/authserver.conf
+#RUN mv -v etc/worldserver.conf.dist etc/worldserver.conf
+
+RUN if [ "x$FLAVOUR" = "xsql" ] || [ "x$FLAVOUR" = "xfull" ] ; then \
+ curl -Lo TDB_full_world.7z "$(curl -sSL https://api.github.com/repos/TrinityCore/TrinityCore/releases \
+    | jq -r --arg tag TDB335 '[.[]|select(.tag_name|contains($tag))|select(.assets[0].browser_download_url|endswith(".7z")).assets[].browser_download_url]|max')" \
+ && 7zr x -y -osrc/sql -- TDB_full_world.7z \
+ && rm -fv TDB_full_world.7z \
+ && ln -s src/sql/TDB_full_world_*.sql \
+ ; fi
 
 
-FROM busybox:stable-glibc AS slim
+
+FROM busybox:stable-glibc
 LABEL author="Nicola Worthington <nicolaw@tfb.net>"
 
+ARG FLAVOUR
 ARG BUILD_DATE
 ARG VCS_REF
 ARG BUILD_VERSION
@@ -112,12 +111,12 @@ LABEL org.label-schema.vcs-url="https://github.com/NeechBear/trinitycore"
 LABEL org.label-schema.vcs-ref=$VCS_REF
 LABEL org.label-schema.vendor="Nicola Worthington"
 LABEL org.label-schema.version=$BUILD_VERSION
-LABEL org.label-schema.docker.cmd.worldserver="docker run --rm -p 8085:8085 -p 3443:3443 -p 7878:7878 -v \$PWD/worldserver.conf:/etc/worldserver.conf -d nicolaw/trinitycore:3.3.5-slim worldserver"
-LABEL org.label-schema.docker.cmd.authserver="docker run --rm -p 3724:3724 -v \$PWD/authserver.conf:/etc/authserver.conf -d nicolaw/trinitycore:3.3.5-slim authserver"
-LABEL org.label-schema.docker.cmd.mapextractor="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-slim mapextractor -i /wow -o /mapdata -e 7 -f 0"
-LABEL org.label-schema.docker.cmd.vmap4extractor="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-slim vmap4extractor -l -d /wow/Data"
-LABEL org.label-schema.docker.cmd.vmap4assembler="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-slim vmap4assembler /mapdata/Buildings /mapdata/vmaps"
-LABEL org.label-schema.docker.cmd.mmaps_generator="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-slim mmaps_generator"
+LABEL org.label-schema.docker.cmd.worldserver="docker run --rm -p 8085:8085 -p 3443:3443 -p 7878:7878 -v \$PWD/worldserver.conf:/etc/worldserver.conf -d nicolaw/trinitycore:3.3.5-${FLAVOUR} worldserver"
+LABEL org.label-schema.docker.cmd.authserver="docker run --rm -p 3724:3724 -v \$PWD/authserver.conf:/etc/authserver.conf -d nicolaw/trinitycore:3.3.5-${FLAVOUR} authserver"
+LABEL org.label-schema.docker.cmd.mapextractor="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-${FLAVOUR} mapextractor -i /wow -o /mapdata -e 7 -f 0"
+LABEL org.label-schema.docker.cmd.vmap4extractor="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-${FLAVOUR} vmap4extractor -l -d /wow/Data"
+LABEL org.label-schema.docker.cmd.vmap4assembler="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-${FLAVOUR} vmap4assembler /mapdata/Buildings /mapdata/vmaps"
+LABEL org.label-schema.docker.cmd.mmaps_generator="docker run --rm -v \$PWD/World_of_Warcraft:/wow -v \$PWD/mapdata:/mapdata -w /mapdata -it nicolaw/trinitycore:3.3.5-${FLAVOUR} mmaps_generator"
 
 ENV LD_LIBRARY_PATH=/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu PATH=/bin:/usr/bin:/opt/trinitycore/bin
 COPY --from=build /artifacts /
