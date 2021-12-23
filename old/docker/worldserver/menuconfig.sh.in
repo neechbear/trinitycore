@@ -1,7 +1,0 @@
-MENUORDER=2
-LISTEN="3724/tcp"
-EXPOSE="3724:3724"
-NAME="authserver"
-TITLE="Auth Server"
-SUMMARY="TrinityCore Authentication Server"
-DESCRIPTION="Logon and authentication server."

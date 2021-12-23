@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# MIT License
+# Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
+# https://github.com/neechbear/trinitycore
+
+# TODO: Extend this to also optionally download the SQL schema files from the
+#       main upstream TrinityCore Git repository.
+
 set -e
 
 main() {

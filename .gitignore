@@ -1,3 +1,9 @@
+.tdb_full_url.*
+.tdb_full_url.TDB335
+test.php
+realmlist
+realmlist.wtf
+World_of_Warcraft
 World_of_Warcraft/
 World_of_Warcraft/*
 World of Warcraft/*
@@ -9,3 +15,5 @@ vmaps/*
 mmaps/*
 cameras/*
 gt/*
+*.sql
+sql/custom/auth/nicolaw.sql
