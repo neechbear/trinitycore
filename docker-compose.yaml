@@ -56,6 +56,10 @@ services:
     #command: ["/bin/sh", "-c", "sleep 10; worldserver"]
     depends_on:
     - mysql
+    environment:
+      TCDBHOST: mysql
+      TCSOAPUSER: trinity
+      TCSOAPPASS: trinity
     healthcheck:
       test: ["CMD", "nc", "localhost", "8085"]
       timeout: 20s
