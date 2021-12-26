@@ -2,6 +2,9 @@
 
 # MIT License
 # Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
+# https://github.com/neechbear/trinitycore
+# https://trinitycore.atlassian.net/wiki/spaces/tc/pages/2130094/Networking
+# https://us.battle.net/support/en/article/300479
 
 set -Euo pipefail
 

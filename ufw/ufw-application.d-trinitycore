@@ -1,8 +1,23 @@
+# MIT License
+# Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
+# https://github.com/neechbear/trinitycore
+# https://trinitycore.atlassian.net/wiki/spaces/tc/pages/2130093/Networking
 # https://us.battle.net/support/en/article/300479
+#
 # Copy this file into /etc/ufw/applications.d, then run:
+#
 #   ufw reload
 #   ufw app list
-#   ufw allow from "$net" to any app "$app"
+#
+#   ufw allow from "10.0.0.0/8" to any app "TrinityCore AuthServer"
+#   ufw allow from "10.0.0.0/8" to any app "TrinityCore WorldServer"
+#
+#   ufw app info "TrinityCore AuthServer"
+#   ufw app info "TrinityCore BattleNet"
+#   ufw app info "TrinityCore WorldServer"
+#   ufw app info "TrinityCore WorldServer Console"
+#   ufw app info "TrinityCore WorldServer SOAP"
+#
 
 [TrinityCore AuthServer]
 title=TrinityCore AuthServer

@@ -121,14 +121,12 @@ You can now stop and start your TrinityCore server whenever you wish.
 
 ### Creating Initial GM Administrator Account
 
-    ¯\_(ツ)_/¯
+Use the `tcpassword` command to generate a new password that can be inserted
+directly into the MySQL database.
 
-Since the recent `auth.account` table changes moving away from the
-`sha_pass_hash` method, it is unclear how a user can be created through any
-other means than the `worldserver` console. This might mean that there is no
-longer programatic method as both the remote access telnet and SOAP
-interfaces both require authentication, causing a bit of a chicken-and-egg
-scenario.
+    $ make run
+    $ tcpassword janedoe letmein > password.sql
+    $ mysql -h 127.0.0.1 -P 3306 -u trinity -p -D auth < password.sql
 
 
 ### Configuring your Game Client

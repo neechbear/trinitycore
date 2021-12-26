@@ -1,6 +1,7 @@
 ---
 # MIT License
 # Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
+# https://github.com/neechbear/trinitycore
 
 version: "3.4"
 
@@ -29,7 +30,7 @@ services:
   authserver:
     container_name: authserver
     image: nicolaw/trinitycore:3.3.5-sql
-    command: ["/bin/sh", "-c", "sleep 10; wait-for-it.sh mysql:3306 --timeout=0 --strict --child; authserver"]
+    command: ["/bin/sh", "-c", "sleep 10; wait-for-it.sh mysql:3306 --timeout=0 --strict --child; authserver -c /etc/authserver.conf"]
     #command: ["/bin/sh", "-c", "wait-for-it.sh mysql:3306 -t 0 -s -- authserver"]
     #command: ["/bin/sh", "-c", "sleep 10; authserver"]
     depends_on:
@@ -42,6 +43,7 @@ services:
       start_period: 20s
     ports:
     - "3724:3724"
+    - "1119:1119"
     volumes:
     - ./authserver.conf:/etc/authserver.conf
     - ./sql/custom:/src/sql/custom
@@ -49,7 +51,7 @@ services:
   worldserver:
     container_name: worldserver
     image: nicolaw/trinitycore:3.3.5-sql
-    command: ["/bin/sh", "-c", "sleep 10; wait-for-it.sh mysql:3306 --timeout=0 --strict --child; sleep 5; worldserver"]
+    command: ["/bin/sh", "-c", "sleep 10; wait-for-it.sh mysql:3306 --timeout=0 --strict --child; sleep 5; worldserver -c /etc/worldserver.conf"]
     #command: ["/bin/sh", "-c", "/usr/local/bin/wait-for-it.sh mysql:3306 -t 0 -s -- worldserver"]
     #command: ["/bin/sh", "-c", "sleep 10; worldserver"]
     depends_on:
@@ -61,6 +63,10 @@ services:
       start_period: 20s
     ports:
     - "8085:8085"
+    - "8086:8086"
+    - "8087:8087"
+    - "8088:8088"
+    - "8089:8089"
     - "3443:3443"
     - "7878:7878"
     volumes:
