@@ -61,7 +61,7 @@ From your Linux or macOS shell, run the following:
 You can check how up-to-date the downloaded container image is by running the
 following command:
 
-    $ docker inspect nicolaw/trinitycore:3.3.5-slim | jq -r '.[0].Config.Labels'
+    $ docker inspect nicolaw/trinitycore:3.3.5-sql | jq -r '.[0].Config.Labels'
 
 If you find that it is too old and that you need a newer version, you can build
 your own version of the container by following the instructions in the next step
@@ -116,7 +116,11 @@ To start the server, simply run the following:
 
 To stop the server, press `Control-C`.
 
-You can now stop and start your TrinityCore server whenever you wish.
+You can now stop and start your TrinityCore server whenever you wish. The server
+may be run permanently as a detached background service by using
+`docker-compose` directly:
+
+    $ docker-compose start
 
 
 ### Creating Initial GM Administrator Account
@@ -127,6 +131,18 @@ directly into the MySQL database.
     $ make run
     $ tcpassword janedoe letmein > password.sql
     $ mysql -h 127.0.0.1 -P 3306 -u trinity -p -D auth < password.sql
+
+At present this script is a simple PHP example taken from the upstream GitHub
+issue https://github.com/TrinityCore/TrinityCore/issues/25157. It will be
+rewritten as a standalone binary in the near future.
+
+In the mean time simply login with the default username `trinity` and password
+`trinity`, and use the standard GM commands to create additional users. Refer to
+https://trinitycore.atlassian.net/wiki/spaces/tc/pages/2130065/GM+Commands for
+more details.
+
+    .account create janedoe password
+    .account set gmlevel janedoe 3 -1
 
 
 ### Configuring your Game Client

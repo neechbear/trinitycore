@@ -73,7 +73,7 @@ be sufficient. Most people will probably want to use the `sql` flavour as it
 also includes all the SQL files needed to bootstrap all the databases needed by
 the `authserver` and `worldserver`.
 
-    $ make build FLAVOUR=slim # this is the default flavour if not specified
+    $ make build FLAVOUR=slim # minimal image size without SQL files
     $ make build FLAVOUR=sql  # includes all SQL files needed to populate the DB
     $ make build FLAVOUR=full # includes all SQL, source files and build root
 
