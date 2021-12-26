@@ -31,8 +31,6 @@ services:
     container_name: authserver
     image: nicolaw/trinitycore:3.3.5-sql
     command: ["/bin/sh", "-c", "sleep 10; wait-for-it.sh mysql:3306 --timeout=0 --strict --child; authserver -c /etc/authserver.conf"]
-    #command: ["/bin/sh", "-c", "wait-for-it.sh mysql:3306 -t 0 -s -- authserver"]
-    #command: ["/bin/sh", "-c", "sleep 10; authserver"]
     depends_on:
     - mysql
     - worldserver
@@ -52,11 +50,11 @@ services:
     container_name: worldserver
     image: nicolaw/trinitycore:3.3.5-sql
     command: ["/bin/sh", "-c", "sleep 10; wait-for-it.sh mysql:3306 --timeout=0 --strict --child; sleep 5; worldserver -c /etc/worldserver.conf"]
-    #command: ["/bin/sh", "-c", "/usr/local/bin/wait-for-it.sh mysql:3306 -t 0 -s -- worldserver"]
-    #command: ["/bin/sh", "-c", "sleep 10; worldserver"]
     depends_on:
     - mysql
     environment:
+      # These 3 variables are used by the tcadmin utility command.
+      # See https://github.com/neechbear/tcadmin/.
       TCDBHOST: mysql
       TCSOAPUSER: trinity
       TCSOAPPASS: trinity
