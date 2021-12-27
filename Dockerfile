@@ -86,7 +86,7 @@ COPY ["tcpassword","gettdb","wait-for-it.sh","usr/local/bin/"]
 #ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh usr/local/bin/wait-for-it.sh
 #ADD https://raw.githubusercontent.com/bells17/wait-for-it-for-busybox/master/wait-for-it.sh usr/local/bin/wait-for-it.sh
 ADD https://raw.githubusercontent.com/neechbear/tcadmin/master/tcadmin usr/local/bin/tcadmin
-RUN mkdir -pv usr/bin/ && ln -s -t usr/bin/ /bin/env && chmod +rx usr/local/bin/*
+RUN mkdir -pv usr/bin/ && ln -s -t usr/bin/ /bin/env && chmod -v +rx usr/local/bin/*
 
 # Save upstream source Git SHA information that we built form.
 RUN git -C /src rev-parse HEAD > .git-rev \
@@ -103,6 +103,7 @@ RUN tar -cf - \
     /usr/bin/7zr \
     /usr/bin/jq \
     /usr/bin/git \
+    /usr/bin/xml2 \
     /opt/trinitycore \
     /etc/*server.conf.dist \
   | tar -C /artifacts/ -xvf -
