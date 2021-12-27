@@ -37,7 +37,8 @@ GIT_REPO = https://github.com/$(GITHUB_REPO).git
 
 # What to call the resulting container image.
 IMAGE_TAG = $(GIT_BRANCH)-$(FLAVOUR)
-IMAGE_NAME = nicolaw/trinitycore:$(IMAGE_TAG)
+IMAGE_REPO = nicolaw/trinitycore
+IMAGE_NAME = $(IMAGE_REPO):$(IMAGE_TAG)
 
 # SHA of upstream TrinityCore source that has been built (used for publishing).
 BUILT_UPSTREAM_SHA = $(shell docker run --rm $(IMAGE_NAME) cat /.git-rev-short)
@@ -148,12 +149,15 @@ pull-all:
 
 publish:
 	docker tag $(IMAGE_NAME) $(IMAGE_NAME)-$(BUILT_UPSTREAM_SHA)
+	docker push $(IMAGE_NAME)
 	docker push $(IMAGE_NAME)-$(BUILT_UPSTREAM_SHA)
 
 publish-all:
 	$(MAKE) -f $(MAKEFILE) publish FLAVOUR=slim
 	$(MAKE) -f $(MAKEFILE) publish FLAVOUR=sql
 	$(MAKE) -f $(MAKEFILE) publish FLAVOUR=full
+	docker tag $(IMAGE_NAME) $(IMAGE_REPO):latest
+	docker push $(IMAGE_REPO):latest
 
 test:
 	docker run --rm -it $(IMAGE_NAME)
