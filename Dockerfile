@@ -2,11 +2,6 @@
 # Copyright (c) 2017-2021 Nicola Worthington <nicolaw@tfb.net>
 # https://github.com/neechbear/trinitycore
 
-# TODO: Setup automatic CI pipeline to make a nightly build and publish to
-#       DockerHub.
-#
-# TODO: Add command_not_found_handle() to intercept tcadmin SOAP commands.
-
 # Intermediate build container can be pruned by listing filtered by image label:
 # docker image rm "$(docker image ls --filter "label=org.label-schema.name=nicolaw/trinitycore-intermediate-build" --quiet)"
 
@@ -56,25 +51,8 @@ RUN apt-get -qq -o Dpkg::Use-Pty=0 update \
 
 RUN git clone --branch ${GIT_BRANCH} --single-branch --depth 1 ${GIT_REPO} /src
 
-# TODO: Add debug options to Dockerfile multistage build debug tag flavour.
-#  if [[ "${cmdarg_cfg[debug]}" == true ]]; then
-#    # https://github.com/TrinityCore/TrinityCore/blob/master/.travis.yml
-#    # https://trinitycore.atlassian.net/wiki/display/tc/Linux+Core+Installation
-#    define[WITH_WARNINGS]=1
-#    define[WITH_COREDEBUG]=0 # What does this do, and why is it 0 on a debug build?
-#    define[CMAKE_BUILD_TYPE]="Debug"
-#    define[CMAKE_C_FLAGS]="-Werror"
-#    define[CMAKE_CXX_FLAGS]="-Werror"
-#    define[CMAKE_C_FLAGS_DEBUG]="-DNDEBUG"
-#    define[CMAKE_CXX_FLAGS_DEBUG]="-DNDEBUG"
-#  fi
-#  if [[ "${define[WITH_WARNINGS]}" == "0" ]]; then
-#    extra_cmake_args+=("-Wno-dev")
-#  fi
-
 RUN mkdir -pv /build/ /artifacts/
 WORKDIR /build
-# TODO: Perhaps get some of these values (or augment them) from build args?
 RUN cmake ../src -DTOOLS=1 -DWITH_WARNINGS=0 -DCMAKE_INSTALL_PREFIX=/opt/trinitycore -DCONF_DIR=/etc -Wno-dev
 RUN make -j$(nproc)
 RUN make install
@@ -83,8 +61,6 @@ WORKDIR /artifacts
 
 # Install some additional utilitiy helper tools.
 COPY ["tcpassword","gettdb","wait-for-it.sh","usr/local/bin/"]
-#ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh usr/local/bin/wait-for-it.sh
-#ADD https://raw.githubusercontent.com/bells17/wait-for-it-for-busybox/master/wait-for-it.sh usr/local/bin/wait-for-it.sh
 ADD https://raw.githubusercontent.com/neechbear/tcadmin/master/tcadmin usr/local/bin/tcadmin
 RUN mkdir -pv usr/bin/ && ln -s -t usr/bin/ /bin/env && chmod -v +rx usr/local/bin/*
 
@@ -113,7 +89,6 @@ ARG FLAVOUR=slim
 RUN if [ "x${FLAVOUR}" = "xsql" ] || [ "x${FLAVOUR}" = "xfull" ] ; then \
     tar -cf - /src/sql | tar -C /artifacts/ -xvf - \
  ; fi
-#    tar -cf - --exclude=/src/sql/old /src/sql | tar -C /artifacts/ -xvf - \
 
 # Copy all source, some build files for "full" flavour build tag.
 RUN if [ "x${FLAVOUR}" = "xfull" ] ; then \

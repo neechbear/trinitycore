@@ -1,2 +1,0 @@
-RewriteEngine on
-RewriteRule ^/?$ /Keira2/ [L,L=301]

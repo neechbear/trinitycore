@@ -1,4 +1,0 @@
-Please select which Docker containers you would like to run as part of
-your Dockerised TrinityCore server. The minimum requirements for working
-self-contained server (assuming no pre-existing external components),
-should include a database, authserver and worldserver.
